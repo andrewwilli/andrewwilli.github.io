@@ -29,498 +29,255 @@
     }
 
     html, body {
-      height: 100%;
-      font-family: 'Inter', -apple-system, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      -webkit-font-smoothing: antialiased;
-      overflow: hidden;
+      height: 100%; font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg); color: var(--text);
+      -webkit-font-smoothing: antialiased; overflow: hidden;
     }
 
-    /* ─── PIN SCREEN ───────────────────────────────────────── */
+    /* ─── PIN SCREEN ─────────────────────────────────────────── */
     #pin-screen {
-      position: fixed; inset: 0;
+      position: fixed; inset: 0; z-index: 1000;
       background: var(--primary);
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
-      z-index: 1000;
       transition: opacity 0.4s ease;
     }
     #pin-screen.out { opacity: 0; pointer-events: none; }
 
-    .pin-logo {
-      font-size: 44px;
-      margin-bottom: 20px;
-      animation: float 3s ease-in-out infinite;
-    }
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-6px); }
-    }
+    .pin-logo { font-size: 44px; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    .pin-title { font-family: 'Playfair Display', Georgia, serif; font-size: 26px; font-weight: 400; color: white; letter-spacing: 0.02em; margin-bottom: 6px; }
+    .pin-sub { font-size: 13px; font-weight: 300; color: rgba(255,255,255,0.55); margin-bottom: 44px; }
 
-    .pin-title {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 26px; font-weight: 400;
-      color: white; letter-spacing: 0.02em;
-      margin-bottom: 6px;
-    }
-    .pin-sub {
-      font-size: 13px; font-weight: 300;
-      color: rgba(255,255,255,0.55);
-      margin-bottom: 44px;
-    }
-
-    .pin-dots {
-      display: flex; gap: 14px;
-      margin-bottom: 40px;
-    }
-    .pin-dot {
-      width: 11px; height: 11px;
-      border-radius: 50%;
-      border: 1.5px solid rgba(255,255,255,0.35);
-      transition: all 0.18s ease;
-    }
-    .pin-dot.on {
-      background: white; border-color: white;
-      transform: scale(1.15);
-    }
+    .pin-dots { display: flex; gap: 14px; margin-bottom: 40px; }
+    .pin-dot { width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.35); transition: all 0.18s ease; }
+    .pin-dot.on { background: white; border-color: white; transform: scale(1.15); }
     .pin-dots.shake { animation: shake 0.38s ease; }
     @keyframes shake {
       0%,100% { transform: translateX(0); }
-      20% { transform: translateX(-9px); }
-      40% { transform: translateX(9px); }
-      60% { transform: translateX(-6px); }
-      80% { transform: translateX(6px); }
+      20% { transform: translateX(-9px); } 40% { transform: translateX(9px); }
+      60% { transform: translateX(-6px); } 80% { transform: translateX(6px); }
     }
 
-    .pin-pad {
-      display: grid;
-      grid-template-columns: repeat(3, 72px);
-      gap: 14px;
-    }
+    .pin-pad { display: grid; grid-template-columns: repeat(3, 72px); gap: 14px; }
     .pin-btn {
-      width: 72px; height: 72px;
-      border-radius: 50%; border: none;
-      background: rgba(255,255,255,0.1);
-      color: white; font-size: 22px;
-      font-family: 'Inter', sans-serif; font-weight: 400;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
+      width: 72px; height: 72px; border-radius: 50%; border: none;
+      background: rgba(255,255,255,0.1); color: white;
+      font-size: 22px; font-family: 'Inter', sans-serif; font-weight: 400;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
       transition: background 0.12s ease;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent; touch-action: manipulation;
     }
     .pin-btn:active { background: rgba(255,255,255,0.24); }
     .pin-btn.ghost { visibility: hidden; }
+    .pin-error { font-size: 12px; color: rgba(255,180,180,0.9); margin-top: 20px; height: 16px; text-align: center; }
 
-    .pin-error {
-      font-size: 12px; color: rgba(255,180,180,0.9);
-      margin-top: 20px; height: 16px;
-      text-align: center; letter-spacing: 0.04em;
-    }
-
-    /* ─── WELCOME SCREEN ───────────────────────────────────── */
+    /* ─── WELCOME SCREEN ─────────────────────────────────────── */
     #welcome-screen {
-      position: fixed; inset: 0;
+      position: fixed; inset: 0; z-index: 90;
       background: var(--primary);
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       text-align: center; padding: 40px;
-      z-index: 90;
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.5s ease;
+      opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
     }
     #welcome-screen.on { opacity: 1; pointer-events: all; }
-
-    .welcome-hearts {
-      font-size: 52px; margin-bottom: 28px;
-      animation: float 3s ease-in-out infinite;
-    }
-    .welcome-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 34px; font-weight: 400; font-style: italic;
-      color: white; margin-bottom: 14px;
-    }
-    .welcome-body {
-      font-size: 15px; font-weight: 300;
-      color: rgba(255,255,255,0.65);
-      line-height: 1.7; margin-bottom: 44px;
-    }
+    .welcome-hearts { font-size: 52px; margin-bottom: 28px; animation: float 3s ease-in-out infinite; }
+    .welcome-title { font-family: 'Playfair Display', serif; font-size: 34px; font-weight: 400; font-style: italic; color: white; margin-bottom: 14px; }
+    .welcome-body { font-size: 15px; font-weight: 300; color: rgba(255,255,255,0.65); line-height: 1.7; margin-bottom: 44px; }
     .welcome-cta {
-      padding: 14px 36px;
-      background: white; color: var(--primary);
-      border: none; border-radius: 40px;
-      font-size: 15px; font-family: 'Inter', sans-serif; font-weight: 500;
-      cursor: pointer; letter-spacing: 0.02em;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
+      padding: 14px 36px; background: white; color: var(--primary);
+      border: none; border-radius: 40px; font-size: 15px;
+      font-family: 'Inter', sans-serif; font-weight: 500; cursor: pointer;
+      -webkit-tap-highlight-color: transparent; touch-action: manipulation;
       transition: transform 0.1s ease;
     }
     .welcome-cta:active { transform: scale(0.96); }
 
-    /* ─── MAIN APP ──────────────────────────────────────────── */
+    /* ─── MAIN APP ───────────────────────────────────────────── */
     #app {
-      position: fixed; inset: 0;
-      display: flex; flex-direction: column;
-      background: var(--bg);
-      opacity: 0; transition: opacity 0.4s ease;
+      position: fixed; inset: 0; display: flex; flex-direction: column;
+      background: var(--bg); opacity: 0; transition: opacity 0.4s ease; z-index: 20;
+      pointer-events: none;
     }
-    #app.on { opacity: 1; }
+    #app.on { opacity: 1; pointer-events: all; }
 
     .app-header {
       background: var(--primary);
-      padding: 16px 20px 20px;
-      padding-top: max(16px, env(safe-area-inset-top));
+      padding: 14px 20px 18px;
+      padding-top: max(14px, env(safe-area-inset-top));
       flex-shrink: 0;
     }
-    .app-header-row {
-      display: flex; align-items: center;
-      justify-content: space-between;
-      margin-bottom: 3px;
+    .app-header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px; }
+    .app-title { font-family: 'Playfair Display', serif; font-size: 21px; font-weight: 600; color: white; }
+    .tc-link { font-size: 10px; font-weight: 500; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.09em; cursor: pointer; padding: 4px 0 4px 8px; -webkit-tap-highlight-color: transparent; }
+    .app-sub { font-size: 12px; font-weight: 300; color: rgba(255,255,255,0.5); margin-bottom: 10px; }
+
+    .balance-bar {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.12); border-radius: 20px;
+      padding: 7px 14px; width: fit-content;
     }
-    .app-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 21px; font-weight: 600; color: white;
-    }
-    .tc-link {
-      font-size: 10px; font-weight: 500;
-      color: rgba(255,255,255,0.5);
-      text-transform: uppercase; letter-spacing: 0.09em;
-      cursor: pointer; padding: 4px 0 4px 8px;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .app-sub {
-      font-size: 12px; font-weight: 300;
-      color: rgba(255,255,255,0.5);
-    }
+    .balance-label { font-size: 12px; color: rgba(255,255,255,0.6); font-weight: 300; }
+    .balance-num { font-size: 15px; font-weight: 500; color: white; }
 
     .coupon-list {
-      flex: 1; overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      padding: 18px 16px;
+      flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
+      padding: 16px 16px;
       padding-bottom: max(24px, env(safe-area-inset-bottom));
     }
 
-    /* ─── COUPON CARD ───────────────────────────────────────── */
+    /* ─── COUPON CARD ────────────────────────────────────────── */
     .coupon-card {
-      background: var(--card);
-      border-radius: var(--r);
-      margin-bottom: 11px;
-      overflow: hidden;
-      cursor: pointer;
+      background: var(--card); border-radius: var(--r); margin-bottom: 10px;
+      overflow: hidden; cursor: pointer;
       box-shadow: 0 1px 6px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.04);
       transition: transform 0.13s ease;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent; touch-action: manipulation;
     }
     .coupon-card:active { transform: scale(0.975); }
-    .coupon-card.used { opacity: 0.55; }
-
+    .coupon-card.locked { opacity: 0.6; }
     .card-bar { height: 3px; background: var(--primary); }
-    .coupon-card.used .card-bar { background: #ccc; }
-
-    .card-inner {
-      padding: 15px 15px 14px;
-      display: flex; gap: 13px; align-items: flex-start;
-    }
-    .card-emoji { font-size: 28px; flex-shrink: 0; margin-top: 1px; }
+    .coupon-card.locked .card-bar { background: #ccc; }
+    .card-inner { padding: 14px 15px 13px; display: flex; gap: 13px; align-items: flex-start; }
+    .card-emoji { font-size: 27px; flex-shrink: 0; margin-top: 1px; }
     .card-body { flex: 1; min-width: 0; }
-    .card-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 15px; font-weight: 600; color: var(--text);
-      line-height: 1.3; margin-bottom: 3px;
-    }
-    .card-teaser {
-      font-size: 12px; color: var(--text-muted);
-      font-weight: 300; line-height: 1.4;
-    }
-    .card-footer {
-      display: flex; align-items: center;
-      justify-content: space-between; margin-top: 10px;
-    }
-    .kiss-pill {
-      display: inline-flex; align-items: center; gap: 4px;
-      background: var(--gold-bg); color: #8a6235;
-      padding: 4px 10px; border-radius: 20px;
-      font-size: 11px; font-weight: 500;
-    }
-    .used-tag {
-      font-size: 10px; font-weight: 500;
-      text-transform: uppercase; letter-spacing: 0.07em;
-      color: var(--text-muted);
-    }
+    .card-title { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.3; margin-bottom: 3px; }
+    .card-teaser { font-size: 12px; color: var(--text-muted); font-weight: 300; line-height: 1.4; }
+    .card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; flex-wrap: wrap; gap: 6px; }
 
-    /* ─── MODAL ─────────────────────────────────────────────── */
-    #overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.38);
-      z-index: 200; opacity: 0; pointer-events: none;
-      transition: opacity 0.28s ease;
-    }
+    .kiss-pill { display: inline-flex; align-items: center; gap: 4px; background: var(--gold-bg); color: #8a6235; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+    .kiss-pill.cant { background: #f5e8e8; color: #b05050; }
+    .card-tags { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .redeemed-tag { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em; color: var(--primary); }
+    .countdown-tag { font-size: 10px; font-weight: 500; background: rgba(42,89,85,0.1); color: var(--primary); padding: 3px 8px; border-radius: 10px; }
+    .countdown-tag.today { background: rgba(184,147,106,0.18); color: #8a6235; }
+    .countdown-tag.past { background: #f5e8e8; color: #b05050; }
+
+    /* ─── MODAL ──────────────────────────────────────────────── */
+    #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.38); z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.28s ease; }
     #overlay.on { opacity: 1; pointer-events: all; }
-
-    #modal {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: var(--card);
-      border-radius: 22px 22px 0 0;
-      z-index: 201;
-      transform: translateY(100%);
-      transition: transform 0.34s cubic-bezier(0.32, 0.72, 0, 1);
-      max-height: 92vh;
-      display: flex; flex-direction: column;
-    }
+    #modal { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-radius: 22px 22px 0 0; z-index: 201; transform: translateY(100%); transition: transform 0.34s cubic-bezier(0.32, 0.72, 0, 1); max-height: 92vh; display: flex; flex-direction: column; }
     #modal.on { transform: translateY(0); }
-
-    .modal-grip {
-      width: 36px; height: 4px;
-      background: var(--border);
-      border-radius: 2px;
-      margin: 11px auto 0; flex-shrink: 0;
-    }
-    .modal-body {
-      overflow-y: auto; -webkit-overflow-scrolling: touch;
-      flex: 1; padding: 18px 22px;
-      padding-bottom: max(28px, env(safe-area-inset-bottom));
-    }
+    .modal-grip { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 11px auto 0; flex-shrink: 0; }
+    .modal-body { overflow-y: auto; -webkit-overflow-scrolling: touch; flex: 1; padding: 18px 22px; padding-bottom: max(28px, env(safe-area-inset-bottom)); }
 
     .modal-head { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 14px; }
     .modal-emoji { font-size: 34px; flex-shrink: 0; }
-    .modal-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 21px; font-weight: 600; line-height: 1.25;
-      color: var(--text);
-    }
-
-    .modal-kisses {
-      display: inline-flex; align-items: center; gap: 5px;
-      background: var(--gold-bg); color: #8a6235;
-      padding: 6px 14px; border-radius: 20px;
-      font-size: 12px; font-weight: 500;
-      margin-bottom: 14px;
-    }
-
-    .modal-desc {
-      font-size: 14px; line-height: 1.7;
-      color: #484848; font-weight: 300;
-      margin-bottom: 10px;
-    }
-    .modal-note {
-      font-size: 13px; color: var(--text-muted);
-      font-style: italic;
-      background: var(--bg); border-radius: var(--r-sm);
-      padding: 11px 13px; line-height: 1.55;
-      margin-bottom: 18px;
-    }
+    .modal-title { font-family: 'Playfair Display', serif; font-size: 21px; font-weight: 600; line-height: 1.25; color: var(--text); }
+    .modal-kisses { display: inline-flex; align-items: center; gap: 5px; background: var(--gold-bg); color: #8a6235; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; margin-bottom: 14px; }
+    .modal-desc { font-size: 14px; line-height: 1.7; color: #484848; font-weight: 300; margin-bottom: 10px; }
+    .modal-note { font-size: 13px; color: var(--text-muted); font-style: italic; background: var(--bg); border-radius: var(--r-sm); padding: 11px 13px; line-height: 1.55; margin-bottom: 18px; }
 
     .section-divider { height: 1px; background: var(--border); margin: 16px 0; }
-
+    .section-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--primary); margin-bottom: 10px; display: block; }
     .input-group { margin-bottom: 18px; }
-    .input-label {
-      display: block;
-      font-size: 10px; font-weight: 600;
-      text-transform: uppercase; letter-spacing: 0.1em;
-      color: var(--primary); margin-bottom: 10px;
-    }
 
     .pill-grid { display: flex; flex-wrap: wrap; gap: 8px; }
-    .pill {
-      padding: 8px 14px; border-radius: 20px;
-      border: 1.5px solid var(--border);
-      font-size: 13px; color: var(--text);
-      cursor: pointer; user-select: none;
-      transition: all 0.16s ease;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-    }
-    .pill.on {
-      background: var(--primary); border-color: var(--primary);
-      color: white;
-    }
-    .pill.disabled { opacity: 0.45; pointer-events: none; }
+    .pill { padding: 8px 14px; border-radius: 20px; border: 1.5px solid var(--border); font-size: 13px; color: var(--text); cursor: pointer; user-select: none; transition: all 0.16s ease; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+    .pill.on { background: var(--primary); border-color: var(--primary); color: white; }
 
-    .field-input {
-      width: 100%; padding: 11px 13px;
-      border: 1.5px solid var(--border); border-radius: var(--r-sm);
-      font-size: 14px; font-family: 'Inter', sans-serif;
-      color: var(--text); background: white;
-      outline: none; transition: border-color 0.18s ease;
-      -webkit-appearance: none; appearance: none;
-    }
+    .field-input { width: 100%; padding: 11px 13px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-size: 14px; font-family: 'Inter', sans-serif; color: var(--text); background: white; outline: none; transition: border-color 0.18s ease; -webkit-appearance: none; appearance: none; }
     .field-input:focus { border-color: var(--primary); }
-    .field-input:disabled { background: var(--bg); color: var(--text-muted); }
 
-    .redeem-btn {
-      width: 100%; padding: 15px; margin-top: 4px;
-      background: var(--primary); color: white;
-      border: none; border-radius: var(--r);
-      font-size: 15px; font-family: 'Inter', sans-serif; font-weight: 500;
-      cursor: pointer; letter-spacing: 0.02em;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-      transition: background 0.15s ease, transform 0.1s ease;
-    }
+    .redeem-btn { width: 100%; padding: 15px; margin-top: 4px; background: var(--primary); color: white; border: none; border-radius: var(--r); font-size: 15px; font-family: 'Inter', sans-serif; font-weight: 500; cursor: pointer; letter-spacing: 0.02em; -webkit-tap-highlight-color: transparent; touch-action: manipulation; transition: background 0.15s ease, transform 0.1s ease; }
     .redeem-btn:active { transform: scale(0.97); background: var(--primary-dark); }
-    .redeem-btn.done {
-      background: var(--border); color: var(--text-muted);
-      cursor: default; pointer-events: none;
-    }
-    .redeemed-date {
-      text-align: center; font-size: 12px;
-      color: var(--text-muted); margin-top: 9px;
-    }
-    .reset-hint {
-      text-align: center; margin-top: 6px;
-      font-size: 11px; color: var(--border);
-      cursor: pointer; padding: 4px;
-      -webkit-tap-highlight-color: transparent;
-    }
+    .redeem-btn.cant-afford { background: #e8e1d8; color: var(--text-muted); }
+    .cant-afford-note { text-align: center; font-size: 12px; color: #b05050; margin-top: 8px; }
 
-    /* ─── CONFIRM DIALOG ────────────────────────────────────── */
-    #confirm {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.45);
-      z-index: 300;
-      display: flex; align-items: center; justify-content: center;
-      padding: 24px;
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.2s ease;
-    }
+    .history-list { margin-top: 4px; }
+    .history-item { display: flex; justify-content: space-between; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--border); gap: 10px; }
+    .history-item:last-child { border-bottom: none; }
+    .history-date { font-size: 12px; color: var(--text-muted); flex-shrink: 0; }
+    .history-detail { font-size: 12px; color: var(--text); flex: 1; text-align: right; line-height: 1.4; }
+
+    /* ─── CONFIRM ────────────────────────────────────────────── */
+    #confirm { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 300; display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; }
     #confirm.on { opacity: 1; pointer-events: all; }
-
-    .confirm-box {
-      background: white; border-radius: var(--r);
-      padding: 28px 22px; text-align: center; width: 100%;
-      transform: scale(0.88);
-      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
+    .confirm-box { background: white; border-radius: var(--r); padding: 28px 22px; text-align: center; width: 100%; transform: scale(0.88); transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
     #confirm.on .confirm-box { transform: scale(1); }
-
     .confirm-emoji { font-size: 46px; margin-bottom: 14px; }
-    .confirm-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 19px; font-weight: 600; margin-bottom: 8px;
-    }
-    .confirm-body {
-      font-size: 13px; color: var(--text-muted);
-      line-height: 1.55; margin-bottom: 22px;
-    }
+    .confirm-title { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 600; margin-bottom: 8px; }
+    .confirm-body { font-size: 13px; color: var(--text-muted); line-height: 1.55; margin-bottom: 22px; }
     .confirm-actions { display: flex; gap: 10px; }
-    .btn-no {
-      flex: 1; padding: 13px;
-      border: 1.5px solid var(--border); border-radius: var(--r-sm);
-      background: transparent; color: var(--text-muted);
-      font-size: 14px; font-family: 'Inter', sans-serif;
-      cursor: pointer; -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-    }
-    .btn-yes {
-      flex: 1; padding: 13px;
-      border: none; border-radius: var(--r-sm);
-      background: var(--primary); color: white;
-      font-size: 14px; font-family: 'Inter', sans-serif; font-weight: 500;
-      cursor: pointer; -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
-    }
+    .btn-no { flex: 1; padding: 13px; border: 1.5px solid var(--border); border-radius: var(--r-sm); background: transparent; color: var(--text-muted); font-size: 14px; font-family: 'Inter', sans-serif; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+    .btn-yes { flex: 1; padding: 13px; border: none; border-radius: var(--r-sm); background: var(--primary); color: white; font-size: 14px; font-family: 'Inter', sans-serif; font-weight: 500; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 
-    /* ─── SUCCESS FLASH ─────────────────────────────────────── */
-    #success {
-      position: fixed; inset: 0;
-      background: var(--primary);
-      z-index: 400;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      text-align: center; padding: 40px;
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
+    /* ─── SUCCESS ────────────────────────────────────────────── */
+    #success { position: fixed; inset: 0; background: var(--primary); z-index: 400; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
     #success.on { opacity: 1; pointer-events: all; }
+    .success-icon { font-size: 60px; margin-bottom: 22px; animation: pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.05s both; }
+    @keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
+    .success-title { font-family: 'Playfair Display', serif; font-size: 27px; font-weight: 600; color: white; margin-bottom: 10px; }
+    .success-body { font-size: 15px; color: rgba(255,255,255,0.65); font-weight: 300; line-height: 1.6; }
+    .success-balance { margin-top: 20px; font-size: 13px; color: rgba(255,255,255,0.45); }
 
-    .success-icon {
-      font-size: 60px; margin-bottom: 22px;
-      animation: pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.05s both;
-    }
-    @keyframes pop {
-      from { transform: scale(0); }
-      to   { transform: scale(1); }
-    }
-    .success-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 27px; font-weight: 600; color: white; margin-bottom: 10px;
-    }
-    .success-body {
-      font-size: 15px; color: rgba(255,255,255,0.65);
-      font-weight: 300; line-height: 1.6;
-    }
-
-    /* ─── TERMS SCREEN ──────────────────────────────────────── */
-    #tc-screen {
-      position: fixed; inset: 0;
-      background: var(--bg);
-      z-index: 50;
-      transform: translateX(100%);
-      transition: transform 0.3s ease;
-      display: flex; flex-direction: column;
-    }
+    /* ─── TERMS ──────────────────────────────────────────────── */
+    #tc-screen { position: fixed; inset: 0; background: var(--bg); z-index: 50; transform: translateX(100%); transition: transform 0.3s ease; display: flex; flex-direction: column; }
     #tc-screen.on { transform: translateX(0); }
+    .tc-header { background: var(--primary); padding: 16px 20px; padding-top: max(16px, env(safe-area-inset-top)); display: flex; align-items: center; gap: 14px; }
+    .tc-back { color: rgba(255,255,255,0.7); font-size: 14px; cursor: pointer; padding: 4px 4px 4px 0; -webkit-tap-highlight-color: transparent; }
+    .tc-header-title { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 400; color: white; }
+    .tc-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 26px 20px; padding-bottom: max(28px, env(safe-area-inset-bottom)); }
+    .tc-item { display: flex; gap: 14px; margin-bottom: 22px; }
+    .tc-num { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 600; color: var(--primary); flex-shrink: 0; width: 22px; }
+    .tc-text { font-size: 14px; line-height: 1.7; color: #484848; font-weight: 300; }
+    .tc-footer { text-align: center; padding: 8px 20px 4px; font-size: 12px; color: var(--text-muted); font-style: italic; line-height: 1.6; }
 
-    .tc-header {
-      background: var(--primary);
-      padding: 16px 20px;
-      padding-top: max(16px, env(safe-area-inset-top));
-      display: flex; align-items: center; gap: 14px;
-    }
-    .tc-back {
-      color: rgba(255,255,255,0.7); font-size: 14px;
-      cursor: pointer; padding: 4px 4px 4px 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .tc-header-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 19px; font-weight: 400; color: white;
-    }
-    .tc-scroll {
-      flex: 1; overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      padding: 26px 20px;
-      padding-bottom: max(28px, env(safe-area-inset-bottom));
-    }
-    .tc-item {
-      display: flex; gap: 14px; margin-bottom: 22px;
-    }
-    .tc-num {
-      font-family: 'Playfair Display', serif;
-      font-size: 17px; font-weight: 600;
-      color: var(--primary); flex-shrink: 0; width: 22px;
-    }
-    .tc-text {
-      font-size: 14px; line-height: 1.7;
-      color: #484848; font-weight: 300;
-    }
-    .tc-footer {
-      text-align: center; padding: 8px 20px 4px;
-      font-size: 12px; color: var(--text-muted);
-      font-style: italic; line-height: 1.6;
-    }
+    /* ─── ADMIN PANEL ────────────────────────────────────────── */
+    #admin-panel { position: fixed; inset: 0; z-index: 500; display: flex; flex-direction: column; background: var(--bg); opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
+    #admin-panel.on { opacity: 1; pointer-events: all; }
 
-    /* ─── INSTALL HINT ──────────────────────────────────────── */
-    #install-hint {
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: var(--primary-dark); color: white;
-      padding: 14px 20px;
-      padding-bottom: max(14px, env(safe-area-inset-bottom));
-      z-index: 500;
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 12px;
-      transform: translateY(100%);
-      transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
-    }
+    .admin-header { background: var(--primary-dark); padding: 14px 20px 16px; padding-top: max(14px, env(safe-area-inset-top)); flex-shrink: 0; }
+    .admin-header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
+    .admin-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; color: white; }
+    .admin-badge { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.8); padding: 3px 8px; border-radius: 10px; }
+    .admin-sub { font-size: 11px; color: rgba(255,255,255,0.45); font-weight: 300; }
+
+    .admin-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 18px 16px; padding-bottom: max(28px, env(safe-area-inset-bottom)); }
+
+    .admin-section { background: var(--card); border-radius: var(--r); padding: 18px; margin-bottom: 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+    .admin-section-title { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--primary); margin-bottom: 14px; }
+
+    .balance-big { text-align: center; margin-bottom: 18px; }
+    .balance-big-num { font-family: 'Playfair Display', serif; font-size: 52px; font-weight: 600; color: var(--primary); line-height: 1; }
+    .balance-big-label { font-size: 13px; color: var(--text-muted); font-weight: 300; margin-top: 4px; }
+
+    .add-kisses-form { display: flex; flex-direction: column; gap: 10px; }
+    .add-kisses-row { display: flex; gap: 10px; }
+    .num-input { flex: 1; padding: 11px 13px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-size: 16px; font-family: 'Inter', sans-serif; color: var(--text); background: white; outline: none; transition: border-color 0.18s ease; -webkit-appearance: none; text-align: center; }
+    .num-input:focus { border-color: var(--primary); }
+    .add-btn { padding: 11px 20px; background: var(--primary); color: white; border: none; border-radius: var(--r-sm); font-size: 14px; font-family: 'Inter', sans-serif; font-weight: 500; cursor: pointer; white-space: nowrap; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+    .note-input { width: 100%; padding: 10px 13px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-size: 13px; font-family: 'Inter', sans-serif; color: var(--text); background: white; outline: none; transition: border-color 0.18s ease; }
+    .note-input:focus { border-color: var(--primary); }
+    .note-input::placeholder { color: var(--text-muted); }
+
+    .admin-coupon { padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .admin-coupon:last-child { border-bottom: none; }
+    .admin-coupon-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+    .admin-coupon-name { font-size: 14px; font-weight: 500; color: var(--text); flex: 1; }
+    .admin-coupon-cost { font-size: 12px; color: var(--text-muted); flex-shrink: 0; }
+    .reset-btn { font-size: 11px; color: #b05050; background: #f5e8e8; border: none; border-radius: 10px; padding: 4px 10px; cursor: pointer; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; flex-shrink: 0; }
+    .admin-coupon-detail { font-size: 12px; color: var(--text-muted); font-weight: 300; }
+
+    .log-item { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+    .log-item:last-child { border-bottom: none; }
+    .log-sign { font-size: 13px; font-weight: 600; flex-shrink: 0; width: 36px; text-align: right; }
+    .log-sign.plus { color: var(--primary); }
+    .log-sign.minus { color: #b05050; }
+    .log-detail { flex: 1; }
+    .log-desc { font-size: 13px; color: var(--text); }
+    .log-date { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+    .log-empty { font-size: 13px; color: var(--text-muted); font-style: italic; text-align: center; padding: 10px 0; }
+
+    .switch-view-btn { width: 100%; padding: 14px; background: transparent; border: 1.5px solid var(--border); border-radius: var(--r); color: var(--primary); font-size: 14px; font-family: 'Inter', sans-serif; cursor: pointer; margin-bottom: 14px; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+
+    /* ─── INSTALL HINT ───────────────────────────────────────── */
+    #install-hint { position: fixed; bottom: 0; left: 0; right: 0; background: var(--primary-dark); color: white; padding: 14px 20px; padding-bottom: max(14px, env(safe-area-inset-bottom)); z-index: 600; display: flex; align-items: center; justify-content: space-between; gap: 12px; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1); }
     #install-hint.on { transform: translateY(0); }
     .hint-text { font-size: 13px; font-weight: 300; line-height: 1.45; flex: 1; }
     .hint-text strong { font-weight: 500; }
-    .hint-close {
-      font-size: 20px; cursor: pointer; opacity: 0.6;
-      padding: 4px; -webkit-tap-highlight-color: transparent;
-    }
+    .hint-close { font-size: 20px; cursor: pointer; opacity: 0.6; padding: 4px; -webkit-tap-highlight-color: transparent; }
   </style>
 </head>
 <body>
@@ -570,7 +327,11 @@
       <div class="app-title">Love Coupons</div>
       <span class="tc-link" onclick="showTC()">T &amp; C</span>
     </div>
-    <div class="app-sub">for Aina Vogt, with love from Andrew Willi ♡</div>
+    <div class="app-sub">for Ainu Vogt, with love from Andrew Willi ♡</div>
+    <div class="balance-bar">
+      <span class="balance-label">Kiss balance</span>
+      <span class="balance-num" id="balance-display">💋 0</span>
+    </div>
   </div>
   <div class="coupon-list" id="coupon-list"></div>
 </div>
@@ -584,10 +345,22 @@
   <div class="tc-scroll" id="tc-content"></div>
 </div>
 
+<!-- ADMIN PANEL -->
+<div id="admin-panel">
+  <div class="admin-header">
+    <div class="admin-header-row">
+      <div class="admin-title">Love Coupons</div>
+      <span class="admin-badge">Admin</span>
+    </div>
+    <div class="admin-sub">Manage Ainu's coupon collection</div>
+  </div>
+  <div class="admin-scroll" id="admin-scroll"></div>
+</div>
+
 <!-- MODAL OVERLAY -->
 <div id="overlay" onclick="closeModal()"></div>
 
-<!-- MODAL -->
+<!-- COUPON MODAL -->
 <div id="modal">
   <div class="modal-grip"></div>
   <div class="modal-body" id="modal-body"></div>
@@ -598,7 +371,7 @@
   <div class="confirm-box">
     <div class="confirm-emoji">💋</div>
     <div class="confirm-title">Redeem this coupon?</div>
-    <div class="confirm-body" id="confirm-body">This will mark the coupon as used.</div>
+    <div class="confirm-body" id="confirm-body"></div>
     <div class="confirm-actions">
       <button class="btn-no" onclick="closeConfirm()">Not yet</button>
       <button class="btn-yes" onclick="doRedeem()">Yes, redeem!</button>
@@ -610,13 +383,14 @@
 <div id="success">
   <div class="success-icon">🎉</div>
   <div class="success-title">Coupon Redeemed!</div>
-  <div class="success-body" id="success-body">Enjoy it, Ainu! ♡</div>
+  <div class="success-body" id="success-body"></div>
+  <div class="success-balance" id="success-balance"></div>
 </div>
 
-<!-- INSTALL HINT (shown once on first load in browser) -->
+<!-- INSTALL HINT -->
 <div id="install-hint">
   <div class="hint-text">
-    <strong>Save as app:</strong> tap the Share button in Safari, then "Add to Home Screen" — feels like a real app!
+    <strong>Save as app:</strong> tap Share in Safari → "Add to Home Screen"
   </div>
   <div class="hint-close" onclick="dismissHint()">✕</div>
 </div>
@@ -624,108 +398,78 @@
 <script>
 'use strict';
 
-/* ── DATA ──────────────────────────────────────────────────────── */
-const PIN = '121222';
+/* ═══════════════════════════════════════════════════
+   CONFIGURATION  ← change ADMIN_PIN to something
+   only Andrew knows before going live!
+   ═══════════════════════════════════════════════════ */
+const USER_PIN  = '121222';   // Ainu's PIN
+const ADMIN_PIN = '195642';   // Andrew's admin PIN
 
+/* ═══════════════════════════════════════════════════
+   COUPON DATA
+   ═══════════════════════════════════════════════════ */
 const COUPONS = [
   {
-    id: 'massage',
-    emoji: '💆‍♀️',
-    title: 'Full Body Massage with Oil',
-    kisses: 7,
+    id: 'massage', emoji: '💆‍♀️',
+    title: 'Full Body Massage with Oil', kisses: 7,
     teaser: 'You relax — management does all the work',
     desc: 'You can relax/sleep, pick the music (if you like) and management (me) does the work. Duration: until management\'s hands are cramped or you fully fall asleep like a cat.',
     note: 'You can tick options and focus, or leave them blank → management (me) will decide for you.',
     inputs: [
-      {
-        id: 'style', type: 'pills',
-        label: 'Style (choose one)',
-        max: 1,
-        options: ['Spicy massage', 'Relax massage', 'Mmmh-don\'t-know']
-      },
-      {
-        id: 'focus', type: 'pills',
-        label: 'Focus — max 2',
-        max: 2,
-        options: ['Feet', 'Hands', 'Back', 'Gesäss', 'Legs', 'Shoulders']
-      }
+      { id: 'style', type: 'pills', label: 'Style (choose one)', max: 1, options: ['Spicy massage', 'Relax massage', 'Mmmh-don\'t-know'] },
+      { id: 'focus', type: 'pills', label: 'Focus — max 2', max: 2, options: ['Feet', 'Hands', 'Back', 'Gesäss', 'Legs', 'Shoulders'] }
     ]
   },
   {
-    id: 'tshirt',
-    emoji: '👕',
-    title: 'T-Shirt of Your Choice',
-    kisses: 20,
+    id: 'tshirt', emoji: '👕',
+    title: 'T-Shirt of Your Choice', kisses: 20,
     teaser: 'Pick any t-shirt — model it immediately',
     desc: 'You can choose and pick one shirt. No hoodie, only t-shirt! Recipient must model in it immediately. Preferably without pants — so the focus is on the shirt on your beautiful body.',
     inputs: []
   },
   {
-    id: 'compliments',
-    emoji: '💌',
-    title: 'Full Day of Compliments & Love Notes',
-    kisses: 7,
+    id: 'compliments', emoji: '💌',
+    title: 'Full Day of Compliments & Love Notes', kisses: 7,
     teaser: 'A whole day of love, notes & compliments',
     desc: 'Fill in the date — for the time we are awake, this effect takes place! You cannot say "stop" or eye roll. Notes are going to be hidden during the day and if possible the day before.',
     inputs: [
-      { id: 'date', type: 'date', label: 'Choose your day' }
+      { id: 'date', type: 'date', label: 'Choose your day', countdown: true }
     ]
   },
   {
-    id: 'datenight',
-    emoji: '🌙',
-    title: 'Date Night Planner',
-    kisses: 30,
+    id: 'datenight', emoji: '🌙',
+    title: 'Date Night Planner', kisses: 30,
     teaser: 'Management plans & executes a perfect date',
     desc: 'Management (me) will plan and execute a date night. The exact date will be discussed. If food is included, chef accepts "fein" and kisses as payment.',
     inputs: [
-      { id: 'date', type: 'date', label: 'Preferred date (to be confirmed with management)' }
+      { id: 'date', type: 'date', label: 'Preferred date (to be confirmed with management)', countdown: true }
     ]
   },
   {
-    id: 'royalty',
-    emoji: '👑',
-    title: 'Royalty Treatment',
-    kisses: 8,
+    id: 'royalty', emoji: '👑',
+    title: 'Royalty Treatment', kisses: 8,
     teaser: 'You are officially Queen — command at will',
     desc: 'You are officially Queen — the crown from the Love Box is needed to take full effect. You can command while the crown is on your head. I will do literally everything that is possible.',
     note: '→ No crown, no royalty treatment.',
     inputs: []
   },
   {
-    id: 'oral',
-    emoji: '✨',
-    title: 'Oral Pleasure Focus',
-    kisses: 9,
+    id: 'oral', emoji: '✨',
+    title: 'Oral Pleasure Focus', kisses: 9,
     teaser: '100% focus on you, no distraction, no timer',
     desc: '100% focus on you — no distraction, no timer (unless you want). Just your pleasure! Recipient must provide feedback with moans.',
     inputs: [
-      {
-        id: 'surprise', type: 'toggle',
-        label: 'Surprise me',
-        hint: 'Tick to have more fun — it is your choice.'
-      }
+      { id: 'surprise', type: 'toggle', label: 'Surprise me', hint: 'Tick to have more fun — it is your choice.' }
     ]
   },
   {
-    id: 'sensory',
-    emoji: '🎭',
-    title: 'Blindfold, Ear Plugs & Sensory Play',
-    kisses: 7,
+    id: 'sensory', emoji: '🎭',
+    title: 'Blindfold, Ear Plugs & Sensory Play', kisses: 7,
     teaser: 'Senses heightened — maximum teasing',
     desc: 'Senses are heightened → maximum teasing. You can tick the box you like, but there is no going back. No peeking or there will be consequences. We can have a safe word so you are still in control.',
     inputs: [
-      {
-        id: 'intensity', type: 'pills',
-        label: 'Intensity',
-        max: 1,
-        options: ['Mean', 'Normal']
-      },
-      {
-        id: 'safeword', type: 'text',
-        label: 'Safe word (optional)',
-        placeholder: 'Enter your safe word…'
-      }
+      { id: 'intensity', type: 'pills', label: 'Intensity', max: 1, options: ['Mean', 'Normal'] },
+      { id: 'safeword', type: 'text', label: 'Safe word (optional)', placeholder: 'Enter your safe word…' }
     ]
   }
 ];
@@ -740,80 +484,189 @@ const TC_ITEMS = [
   'Your queen status is permanent — the crown from the first Love Box is still valid ♡'
 ];
 
-/* ── STATE ─────────────────────────────────────────────────────── */
-function getStore() {
-  try { return JSON.parse(localStorage.getItem('lc2') || '{}'); } catch { return {}; }
+/* ═══════════════════════════════════════════════════
+   STORAGE
+   Shape: {
+     kisses: 42,
+     inputs:      { couponId: { inputId: value } },
+     redemptions: { couponId: [ {date, ts, inputs} ] },
+     log:         [ {type, amount, note?, couponId?, ts} ]
+   }
+   ═══════════════════════════════════════════════════ */
+const SK = 'lc5';
+function getStore() { try { return JSON.parse(localStorage.getItem(SK) || '{}'); } catch { return {}; } }
+function setStore(s) { localStorage.setItem(SK, JSON.stringify(s)); }
+function getKisses() { return getStore().kisses || 0; }
+function getCouponRedemptions(id) { return (getStore().redemptions || {})[id] || []; }
+function getSavedInputs(id) { return (getStore().inputs || {})[id] || {}; }
+
+function saveCouponInput(couponId, inputId, value) {
+  const s = getStore();
+  if (!s.inputs) s.inputs = {};
+  if (!s.inputs[couponId]) s.inputs[couponId] = {};
+  s.inputs[couponId][inputId] = value;
+  setStore(s);
 }
-function setStore(s) { localStorage.setItem('lc2', JSON.stringify(s)); }
+function creditKisses(amount, note) {
+  const s = getStore();
+  s.kisses = (s.kisses || 0) + amount;
+  if (!s.log) s.log = [];
+  s.log.unshift({ type: 'credit', amount, note: note || '', ts: Date.now() });
+  setStore(s);
+}
+function spendKisses(couponId, kissCost, inputSnapshot) {
+  const s = getStore();
+  s.kisses = Math.max(0, (s.kisses || 0) - kissCost);
+  if (!s.redemptions) s.redemptions = {};
+  if (!s.redemptions[couponId]) s.redemptions[couponId] = [];
+  s.redemptions[couponId].unshift({ date: fmtDate(new Date()), ts: Date.now(), inputs: inputSnapshot });
+  if (!s.log) s.log = [];
+  s.log.unshift({ type: 'redeem', amount: kissCost, couponId, ts: Date.now() });
+  setStore(s);
+}
+function resetCouponHistory(couponId) {
+  const s = getStore();
+  if (s.redemptions) delete s.redemptions[couponId];
+  setStore(s);
+}
 
-/* ── PIN ───────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════
+   UTILITIES
+   ═══════════════════════════════════════════════════ */
+function fmtDate(d) { return d.toLocaleDateString('en-CH', { day: 'numeric', month: 'long', year: 'numeric' }); }
+function daysUntil(dateStr) {
+  if (!dateStr) return null;
+  const t = new Date(dateStr + 'T00:00:00'), now = new Date();
+  now.setHours(0,0,0,0);
+  return Math.round((t - now) / 86400000);
+}
+function countdownLabel(days) {
+  if (days === null) return null;
+  if (days > 1)  return { text: `in ${days} days 📅`, cls: '' };
+  if (days === 1) return { text: 'tomorrow! 📅', cls: '' };
+  if (days === 0) return { text: 'Today! 🎉', cls: 'today' };
+  return { text: `${Math.abs(days)}d ago`, cls: 'past' };
+}
+function fmtInputSummary(coupon, inputs) {
+  if (!inputs || !coupon) return '';
+  const parts = [];
+  (coupon.inputs || []).forEach(inp => {
+    const v = inputs[inp.id];
+    if (!v || (Array.isArray(v) && !v.length)) return;
+    if (Array.isArray(v)) parts.push(v.join(', '));
+    else if (v === true) parts.push(inp.label);
+    else if (typeof v === 'string' && v.trim()) {
+      if (inp.type === 'date') { try { parts.push(fmtDate(new Date(v + 'T00:00:00'))); } catch { parts.push(v); } }
+      else parts.push(v);
+    }
+  });
+  return parts.join(' · ');
+}
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ═══════════════════════════════════════════════════
+   PIN
+   ═══════════════════════════════════════════════════ */
 let pinVal = '';
-
 function pinKey(d) {
   if (pinVal.length >= 6) return;
   pinVal += d;
   renderDots();
   if (pinVal.length === 6) setTimeout(checkPin, 120);
 }
-function pinDel() { pinVal = pinVal.slice(0, -1); renderDots(); }
+function pinDel() { pinVal = pinVal.slice(0,-1); renderDots(); }
 function renderDots() {
-  document.querySelectorAll('.pin-dot').forEach((el, i) =>
-    el.classList.toggle('on', i < pinVal.length));
+  document.querySelectorAll('.pin-dot').forEach((el,i) => el.classList.toggle('on', i < pinVal.length));
 }
 function checkPin() {
-  if (pinVal === PIN) {
-    unlock();
-  } else {
-    pinVal = '';
-    renderDots();
+  if (pinVal === USER_PIN) { hidePinScreen(); enterUserMode(); }
+  else if (pinVal === ADMIN_PIN) { hidePinScreen(); enterAdminMode(); }
+  else {
+    pinVal = ''; renderDots();
     document.getElementById('pin-error').textContent = 'Wrong code — try again';
-    const dotsEl = document.getElementById('pin-dots');
-    dotsEl.classList.add('shake');
-    setTimeout(() => {
-      dotsEl.classList.remove('shake');
-      document.getElementById('pin-error').textContent = '';
-    }, 400);
+    const d = document.getElementById('pin-dots');
+    d.classList.add('shake');
+    setTimeout(() => { d.classList.remove('shake'); document.getElementById('pin-error').textContent = ''; }, 400);
   }
 }
-function unlock() {
+function hidePinScreen() {
   const ps = document.getElementById('pin-screen');
   ps.classList.add('out');
   setTimeout(() => { ps.style.display = 'none'; }, 400);
+}
 
+/* ═══════════════════════════════════════════════════
+   APP MODES
+   ═══════════════════════════════════════════════════ */
+function enterUserMode() {
   const isFirst = !localStorage.getItem('lc_seen');
   if (isFirst) {
     localStorage.setItem('lc_seen', '1');
     document.getElementById('welcome-screen').classList.add('on');
   } else {
-    document.getElementById('app').classList.add('on');
-    maybeShowInstallHint();
+    showApp();
   }
 }
 function showHome() {
   document.getElementById('welcome-screen').classList.remove('on');
+  showApp();
+}
+function showApp() {
+  renderList();
+  updateBalanceDisplay();
   document.getElementById('app').classList.add('on');
   maybeShowInstallHint();
 }
-
-/* ── INSTALL HINT ──────────────────────────────────────────────── */
-function maybeShowInstallHint() {
-  const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
-  if (!isStandalone && !localStorage.getItem('lc_hint')) {
-    setTimeout(() => document.getElementById('install-hint').classList.add('on'), 1200);
-  }
+function enterAdminMode() {
+  renderAdmin();
+  document.getElementById('admin-panel').classList.add('on');
 }
-function dismissHint() {
-  localStorage.setItem('lc_hint', '1');
-  document.getElementById('install-hint').classList.remove('on');
+function exitAdmin() {
+  document.getElementById('admin-panel').classList.remove('on');
+  // return to PIN screen
+  pinVal = ''; renderDots();
+  document.getElementById('pin-error').textContent = '';
+  document.getElementById('pin-screen').style.display = '';
+  document.getElementById('pin-screen').classList.remove('out');
+}
+function adminSwitchToHerView() {
+  document.getElementById('admin-panel').classList.remove('on');
+  showApp();
 }
 
-/* ── COUPON LIST ───────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════
+   BALANCE DISPLAY
+   ═══════════════════════════════════════════════════ */
+function updateBalanceDisplay() {
+  const k = getKisses();
+  document.getElementById('balance-display').textContent = `💋 ${k} kiss${k !== 1 ? 'es' : ''}`;
+}
+
+/* ═══════════════════════════════════════════════════
+   COUPON LIST
+   ═══════════════════════════════════════════════════ */
 function renderList() {
-  const store = getStore();
+  const kisses = getKisses();
   document.getElementById('coupon-list').innerHTML = COUPONS.map(c => {
-    const used = !!store[c.id]?.redeemed;
+    const redemptions = getCouponRedemptions(c.id);
+    const count = redemptions.length;
+    const savedInputs = getSavedInputs(c.id);
+    const canAfford = kisses >= c.kisses;
+
+    // countdown badge
+    let countdownHtml = '';
+    c.inputs.forEach(inp => {
+      if (inp.countdown && savedInputs[inp.id]) {
+        const lbl = countdownLabel(daysUntil(savedInputs[inp.id]));
+        if (lbl) countdownHtml = `<span class="countdown-tag ${lbl.cls}">${lbl.text}</span>`;
+      }
+    });
+
+    const pillCls = canAfford ? '' : ' cant';
+    const pillTxt = canAfford ? `💋 ${c.kisses} kiss${c.kisses !== 1 ? 'es' : ''}` : `Need ${c.kisses} 💋`;
+
     return `
-      <div class="coupon-card${used ? ' used' : ''}" onclick="openCoupon('${c.id}')">
+      <div class="coupon-card${!canAfford ? ' locked' : ''}" onclick="openCoupon('${c.id}')">
         <div class="card-bar"></div>
         <div class="card-inner">
           <div class="card-emoji">${c.emoji}</div>
@@ -821,8 +674,11 @@ function renderList() {
             <div class="card-title">${c.title}</div>
             <div class="card-teaser">${c.teaser}</div>
             <div class="card-footer">
-              <span class="kiss-pill">💋 ${c.kisses} kiss${c.kisses !== 1 ? 'es' : ''}</span>
-              ${used ? '<span class="used-tag">Redeemed</span>' : ''}
+              <span class="kiss-pill${pillCls}">${pillTxt}</span>
+              <div class="card-tags">
+                ${count > 0 ? `<span class="redeemed-tag">${count}× redeemed</span>` : ''}
+                ${countdownHtml}
+              </div>
             </div>
           </div>
         </div>
@@ -830,48 +686,72 @@ function renderList() {
   }).join('');
 }
 
-/* ── MODAL ─────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════
+   MODAL
+   ═══════════════════════════════════════════════════ */
 let activeCouponId = null;
 
 function openCoupon(id) {
   activeCouponId = id;
   const c = COUPONS.find(x => x.id === id);
-  const store = getStore();
-  const st = store[id] || {};
-  const used = !!st.redeemed;
+  const kisses = getKisses();
+  const canAfford = kisses >= c.kisses;
+  const savedInputs = getSavedInputs(id);
+  const redemptions = getCouponRedemptions(id);
 
-  /* build inputs HTML */
+  // inputs
   let inputsHtml = '';
   if (c.inputs.length) {
     inputsHtml = '<div class="section-divider"></div>';
     c.inputs.forEach(inp => {
-      inputsHtml += `<div class="input-group"><span class="input-label">${inp.label}</span>`;
+      inputsHtml += `<div class="input-group"><span class="section-label">${inp.label}</span>`;
       if (inp.type === 'pills') {
-        const saved = st.inputs?.[inp.id] || [];
+        const saved = savedInputs[inp.id] || [];
         inputsHtml += `<div class="pill-grid" data-group="${inp.id}" data-max="${inp.max}">`;
         inp.options.forEach(opt => {
-          const on = saved.includes(opt);
-          inputsHtml += `<div class="pill${on ? ' on' : ''}${used ? ' disabled' : ''}" onclick="togglePill(this)">${opt}</div>`;
+          inputsHtml += `<div class="pill${saved.includes(opt) ? ' on' : ''}" onclick="togglePill(this)">${opt}</div>`;
         });
         inputsHtml += '</div>';
       } else if (inp.type === 'toggle') {
-        const on = st.inputs?.[inp.id] || false;
-        inputsHtml += `<div style="font-size:13px;color:var(--text-muted);margin-bottom:10px;font-weight:300;">${inp.hint}</div>`;
-        inputsHtml += `<div class="pill-grid" data-group="${inp.id}" data-max="1">
-          <div class="pill${on ? ' on' : ''}${used ? ' disabled' : ''}" data-toggle="true" onclick="togglePill(this)">${inp.label}</div>
-        </div>`;
+        const on = savedInputs[inp.id] || false;
+        inputsHtml += `<div style="font-size:13px;color:var(--text-muted);margin-bottom:10px;font-weight:300;">${inp.hint}</div>
+          <div class="pill-grid" data-group="${inp.id}" data-max="1">
+            <div class="pill${on ? ' on' : ''}" data-toggle="true" onclick="togglePill(this)">${inp.label}</div>
+          </div>`;
       } else if (inp.type === 'date') {
-        const val = st.inputs?.[inp.id] || '';
-        inputsHtml += `<input type="date" class="field-input" id="fi-${inp.id}" value="${val}"
-          ${used ? 'disabled' : `onchange="saveField('${inp.id}',this.value)"`}>`;
+        const val = savedInputs[inp.id] || '';
+        inputsHtml += `<input type="date" class="field-input" value="${esc(val)}" oninput="saveFieldLive('${inp.id}',this.value)">`;
       } else if (inp.type === 'text') {
-        const val = st.inputs?.[inp.id] || '';
-        inputsHtml += `<input type="text" class="field-input" id="fi-${inp.id}" value="${escHtml(val)}"
-          placeholder="${escHtml(inp.placeholder || '')}"
-          ${used ? 'disabled' : `onchange="saveField('${inp.id}',this.value)"`}>`;
+        const val = savedInputs[inp.id] || '';
+        inputsHtml += `<input type="text" class="field-input" value="${esc(val)}" placeholder="${esc(inp.placeholder||'')}" oninput="saveFieldLive('${inp.id}',this.value)">`;
       }
       inputsHtml += '</div>';
     });
+  }
+
+  // redeem button
+  let redeemHtml;
+  if (canAfford) {
+    redeemHtml = `<button class="redeem-btn" onclick="startRedeem()">Redeem Coupon</button>`;
+  } else {
+    const need = c.kisses - kisses;
+    redeemHtml = `
+      <button class="redeem-btn cant-afford" onclick="showNeedMore(${need})">Need ${need} more kiss${need!==1?'es':''} 💋</button>
+      <div class="cant-afford-note">Your balance: ${kisses} kiss${kisses!==1?'es':''} — give Andrew ${need} more!</div>`;
+  }
+
+  // history
+  let historyHtml = '';
+  if (redemptions.length) {
+    historyHtml = `<div class="section-divider"></div><span class="section-label">Redeemed ${redemptions.length}×</span><div class="history-list">`;
+    redemptions.forEach(r => {
+      const detail = fmtInputSummary(c, r.inputs);
+      historyHtml += `<div class="history-item">
+        <div class="history-date">${r.date}</div>
+        <div class="history-detail">${detail ? esc(detail) : '—'}</div>
+      </div>`;
+    });
+    historyHtml += '</div>';
   }
 
   document.getElementById('modal-body').innerHTML = `
@@ -879,16 +759,13 @@ function openCoupon(id) {
       <div class="modal-emoji">${c.emoji}</div>
       <div class="modal-title">${c.title}</div>
     </div>
-    <div class="modal-kisses">💋 ${c.kisses} kiss${c.kisses !== 1 ? 'es' : ''} to redeem</div>
+    <div class="modal-kisses">💋 ${c.kisses} kiss${c.kisses!==1?'es':''} to redeem</div>
     <div class="modal-desc">${c.desc}</div>
     ${c.note ? `<div class="modal-note">${c.note}</div>` : ''}
     ${inputsHtml}
     <div class="section-divider"></div>
-    <button class="redeem-btn${used ? ' done' : ''}" onclick="${used ? '' : 'startRedeem()'}">
-      ${used ? '✓ Already Redeemed' : 'Redeem Coupon'}
-    </button>
-    ${used ? `<div class="redeemed-date">Redeemed on ${st.redeemedOn || 'a special day'}</div>
-              <div class="reset-hint" onclick="resetCoupon()" title="Reset">· · ·</div>` : ''}
+    ${redeemHtml}
+    ${historyHtml}
   `;
 
   document.getElementById('overlay').classList.add('on');
@@ -901,149 +778,221 @@ function closeModal() {
   activeCouponId = null;
 }
 
-/* pills */
+function showNeedMore(need) {
+  alert(`You need ${need} more kiss${need!==1?'es':''} from Andrew!\nGo give him some love 💋`);
+}
+
 function togglePill(el) {
-  if (el.classList.contains('disabled')) return;
   const grid = el.closest('[data-group]');
   const groupId = grid.dataset.group;
   const max = parseInt(grid.dataset.max);
-  const isToggle = el.dataset.toggle === 'true';
-
-  if (isToggle) {
+  if (el.dataset.toggle === 'true') {
     el.classList.toggle('on');
-    saveField(groupId, el.classList.contains('on'));
+    saveCouponInput(activeCouponId, groupId, el.classList.contains('on'));
     return;
   }
-
   if (el.classList.contains('on')) {
     el.classList.remove('on');
   } else {
-    const onCount = grid.querySelectorAll('.pill.on').length;
-    if (onCount < max) el.classList.add('on');
+    if (grid.querySelectorAll('.pill.on').length < max) el.classList.add('on');
   }
-  const selected = Array.from(grid.querySelectorAll('.pill.on')).map(p => p.textContent);
-  saveField(groupId, selected);
+  saveCouponInput(activeCouponId, groupId,
+    Array.from(grid.querySelectorAll('.pill.on')).map(p => p.textContent.trim()));
 }
 
-function saveField(inputId, value) {
+function saveFieldLive(inputId, value) {
   if (!activeCouponId) return;
-  const store = getStore();
-  if (!store[activeCouponId]) store[activeCouponId] = {};
-  if (!store[activeCouponId].inputs) store[activeCouponId].inputs = {};
-  store[activeCouponId].inputs[inputId] = value;
-  setStore(store);
+  saveCouponInput(activeCouponId, inputId, value);
+  renderList();
 }
 
-/* ── REDEEM FLOW ───────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════
+   REDEEM FLOW
+   ═══════════════════════════════════════════════════ */
 function startRedeem() {
   const c = COUPONS.find(x => x.id === activeCouponId);
-  document.getElementById('confirm-body').textContent =
-    `Give Andrew ${c.kisses} kiss${c.kisses !== 1 ? 'es' : ''} to redeem "${c.title}". This will mark the coupon as used.`;
+  const detail = fmtInputSummary(c, getSavedInputs(activeCouponId));
+  document.getElementById('confirm-body').innerHTML =
+    `Give Andrew <strong>${c.kisses} kiss${c.kisses!==1?'es':''}</strong> to redeem<br>"${c.title}".` +
+    (detail ? `<br><br><em style="color:var(--primary)">${esc(detail)}</em>` : '');
   document.getElementById('confirm').classList.add('on');
 }
-function closeConfirm() {
-  document.getElementById('confirm').classList.remove('on');
-}
+function closeConfirm() { document.getElementById('confirm').classList.remove('on'); }
+
 function doRedeem() {
   const c = COUPONS.find(x => x.id === activeCouponId);
-  const store = getStore();
-  if (!store[activeCouponId]) store[activeCouponId] = {};
-  store[activeCouponId].redeemed = true;
-  store[activeCouponId].redeemedOn = new Date().toLocaleDateString('en-CH', {day:'numeric',month:'long',year:'numeric'});
-  setStore(store);
-
+  spendKisses(activeCouponId, c.kisses, getSavedInputs(activeCouponId));
   closeConfirm();
   closeModal();
   renderList();
-
+  updateBalanceDisplay();
+  const k = getKisses();
   document.getElementById('success-body').textContent = `Enjoy your "${c.title}", Ainu! ♡`;
+  document.getElementById('success-balance').textContent = `Balance: ${k} kiss${k!==1?'es':''} remaining`;
   document.getElementById('success').classList.add('on');
-  setTimeout(() => document.getElementById('success').classList.remove('on'), 2800);
+  setTimeout(() => document.getElementById('success').classList.remove('on'), 3000);
 }
 
-function resetCoupon() {
-  if (!activeCouponId) return;
-  const store = getStore();
-  if (store[activeCouponId]) {
-    store[activeCouponId].redeemed = false;
-    delete store[activeCouponId].redeemedOn;
-    setStore(store);
-  }
-  closeModal();
-  renderList();
-}
-
-/* ── TERMS ─────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════
+   TERMS
+   ═══════════════════════════════════════════════════ */
 function showTC() {
   document.getElementById('tc-content').innerHTML =
-    TC_ITEMS.map((t, i) => `
-      <div class="tc-item">
-        <div class="tc-num">${i+1}.</div>
-        <div class="tc-text">${t}</div>
-      </div>`).join('') +
+    TC_ITEMS.map((t,i) => `<div class="tc-item"><div class="tc-num">${i+1}.</div><div class="tc-text">${t}</div></div>`).join('') +
     `<div class="tc-footer">Effective immediately — valid forever ♡<br>— Management (Andrew Willi)</div>`;
   document.getElementById('tc-screen').classList.add('on');
 }
 function hideTC() { document.getElementById('tc-screen').classList.remove('on'); }
 
-/* ── MODAL SWIPE-DOWN ──────────────────────────────────────────── */
-(function() {
-  const modal = document.getElementById('modal');
-  let startY = 0, scrollTop = 0;
-  modal.addEventListener('touchstart', e => {
-    startY = e.touches[0].clientY;
-    scrollTop = modal.querySelector('.modal-body').scrollTop;
-  }, { passive: true });
-  modal.addEventListener('touchend', e => {
-    const dy = e.changedTouches[0].clientY - startY;
-    if (dy > 90 && scrollTop <= 0) closeModal();
-  }, { passive: true });
-})();
+/* ═══════════════════════════════════════════════════
+   ADMIN PANEL
+   ═══════════════════════════════════════════════════ */
+function renderAdmin() {
+  const store = getStore();
+  const kisses = store.kisses || 0;
+  const log = store.log || [];
 
-/* ── PWA MANIFEST (blob) ────────────────────────────────────────── */
-(function() {
-  const data = {
-    name: 'Love Coupons for Ainu',
-    short_name: 'Love Coupons',
-    start_url: './',
-    display: 'standalone',
-    background_color: '#f7f4ef',
-    theme_color: '#2a5955',
-    orientation: 'portrait'
-  };
-  try {
-    const url = URL.createObjectURL(new Blob([JSON.stringify(data)], {type:'application/json'}));
-    const link = document.createElement('link');
-    link.rel = 'manifest'; link.href = url;
-    document.head.appendChild(link);
-  } catch(e) {}
-})();
+  const couponRows = COUPONS.map(c => {
+    const redemptions = (store.redemptions || {})[c.id] || [];
+    const count = redemptions.length;
+    const lastDate = count ? redemptions[0].date : null;
+    const lastDetail = count ? fmtInputSummary(c, redemptions[0].inputs) : null;
+    return `<div class="admin-coupon">
+      <div class="admin-coupon-head">
+        <div class="admin-coupon-name">${c.emoji} ${c.title}</div>
+        <div class="admin-coupon-cost">${c.kisses} 💋</div>
+        ${count ? `<button class="reset-btn" onclick="adminReset('${c.id}')">Reset</button>` : ''}
+      </div>
+      <div class="admin-coupon-detail">
+        ${count === 0 ? 'Never redeemed' : `${count}× — last: ${lastDate}${lastDetail ? ' · ' + esc(lastDetail) : ''}`}
+      </div>
+    </div>`;
+  }).join('');
 
-/* ── APPLE TOUCH ICON ───────────────────────────────────────────── */
-(function() {
-  try {
-    const sz = 180;
-    const c = document.createElement('canvas');
-    c.width = c.height = sz;
-    const ctx = c.getContext('2d');
-    ctx.fillStyle = '#2a5955';
-    ctx.fillRect(0, 0, sz, sz);
-    ctx.font = `${sz * 0.52}px serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('♡', sz/2, sz/2 + 2);
-    const link = document.createElement('link');
-    link.rel = 'apple-touch-icon'; link.href = c.toDataURL('image/png');
-    document.head.appendChild(link);
-  } catch(e) {}
-})();
+  const logRows = !log.length
+    ? '<div class="log-empty">No activity yet.</div>'
+    : log.slice(0, 40).map(e => {
+        const isCredit = e.type === 'credit';
+        const coupon = e.couponId ? COUPONS.find(c => c.id === e.couponId) : null;
+        const sign = isCredit
+          ? `<span class="log-sign plus">+${e.amount}</span>`
+          : `<span class="log-sign minus">−${e.amount}</span>`;
+        const desc = isCredit ? (e.note || 'Kisses added') : (coupon ? coupon.title : 'Coupon redeemed');
+        return `<div class="log-item">${sign}
+          <div class="log-detail">
+            <div class="log-desc">${esc(desc)}</div>
+            <div class="log-date">${fmtDate(new Date(e.ts))}</div>
+          </div>
+        </div>`;
+      }).join('');
 
-/* ── UTILS ─────────────────────────────────────────────────────── */
-function escHtml(s) {
-  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  document.getElementById('admin-scroll').innerHTML = `
+    <button class="switch-view-btn" onclick="adminSwitchToHerView()">👁 View as Ainu</button>
+
+    <div class="admin-section">
+      <div class="admin-section-title">Kiss Balance</div>
+      <div class="balance-big">
+        <div class="balance-big-num">💋 ${kisses}</div>
+        <div class="balance-big-label">kiss${kisses!==1?'es':''} available</div>
+      </div>
+      <div class="add-kisses-form">
+        <div class="add-kisses-row">
+          <input type="number" class="num-input" id="admin-amount" placeholder="0" min="1" max="999">
+          <button class="add-btn" onclick="adminAddKisses()">+ Add</button>
+        </div>
+        <input type="text" class="note-input" id="admin-note" placeholder="Note (e.g. Valentine's Day bonus 💋)">
+      </div>
+    </div>
+
+    <div class="admin-section">
+      <div class="admin-section-title">Coupons</div>
+      ${couponRows}
+    </div>
+
+    <div class="admin-section">
+      <div class="admin-section-title">Activity Log</div>
+      ${logRows}
+    </div>
+
+    <div style="text-align:center;padding:8px 0 4px;">
+      <span style="font-size:11px;color:var(--text-muted);cursor:pointer;padding:8px;" onclick="exitAdmin()">Lock &amp; exit admin →</span>
+    </div>
+  `;
 }
 
-/* ── INIT ──────────────────────────────────────────────────────── */
+function adminAddKisses() {
+  const amount = parseInt(document.getElementById('admin-amount').value);
+  const note = document.getElementById('admin-note').value.trim();
+  if (!amount || amount < 1) { alert('Enter a number of kisses to add.'); return; }
+  creditKisses(amount, note);
+  renderAdmin();
+}
+
+function adminReset(couponId) {
+  const c = COUPONS.find(x => x.id === couponId);
+  if (!confirm(`Reset all redemptions for "${c.title}"?\n\nThis cannot be undone.`)) return;
+  resetCouponHistory(couponId);
+  renderAdmin();
+}
+
+/* ═══════════════════════════════════════════════════
+   MODAL SWIPE-DOWN
+   ═══════════════════════════════════════════════════ */
+(function () {
+  const modal = document.getElementById('modal');
+  let startY = 0, bodyTop = 0;
+  modal.addEventListener('touchstart', e => {
+    startY = e.touches[0].clientY;
+    bodyTop = modal.querySelector('.modal-body').scrollTop;
+  }, { passive: true });
+  modal.addEventListener('touchend', e => {
+    if (e.changedTouches[0].clientY - startY > 90 && bodyTop <= 0) closeModal();
+  }, { passive: true });
+})();
+
+/* ═══════════════════════════════════════════════════
+   INSTALL HINT
+   ═══════════════════════════════════════════════════ */
+function maybeShowInstallHint() {
+  const standalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+  if (!standalone && !localStorage.getItem('lc_hint'))
+    setTimeout(() => document.getElementById('install-hint').classList.add('on'), 1400);
+}
+function dismissHint() {
+  localStorage.setItem('lc_hint', '1');
+  document.getElementById('install-hint').classList.remove('on');
+}
+
+/* ═══════════════════════════════════════════════════
+   PWA + ICON
+   ═══════════════════════════════════════════════════ */
+(function () {
+  try {
+    const l = document.createElement('link'); l.rel = 'manifest';
+    l.href = URL.createObjectURL(new Blob([JSON.stringify({
+      name: 'Love Coupons for Ainu', short_name: 'Love Coupons',
+      start_url: './', display: 'standalone',
+      background_color: '#f7f4ef', theme_color: '#2a5955', orientation: 'portrait'
+    })], { type: 'application/json' }));
+    document.head.appendChild(l);
+  } catch(e) {}
+  try {
+    const sz = 180, cv = document.createElement('canvas');
+    cv.width = cv.height = sz;
+    const ctx = cv.getContext('2d');
+    ctx.fillStyle = '#2a5955'; ctx.fillRect(0,0,sz,sz);
+    ctx.fillStyle = 'white'; ctx.font = `${sz*.52}px serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('♡', sz/2, sz/2+2);
+    const l2 = document.createElement('link');
+    l2.rel = 'apple-touch-icon'; l2.href = cv.toDataURL();
+    document.head.appendChild(l2);
+  } catch(e) {}
+})();
+
+/* ═══════════════════════════════════════════════════
+   INIT
+   ═══════════════════════════════════════════════════ */
 renderList();
 </script>
 </body>
