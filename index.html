@@ -746,7 +746,10 @@ function openCoupon(id) {
           </div>`;
       } else if (inp.type === 'date') {
         const val = displayInputs[inp.id] || '';
-        inputsHtml += `<input type="date" class="field-input${isRedeemed ? ' frozen' : ''}" value="${esc(val)}" ${isRedeemed ? 'disabled' : `oninput="saveFieldLive('${inp.id}',this.value)"`}>`;
+        const today = new Date();
+        today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+        const minDate = today.toISOString().split('T')[0];
+        inputsHtml += `<input type="date" class="field-input${isRedeemed ? ' frozen' : ''}" value="${esc(val)}" min="${minDate}" ${isRedeemed ? 'disabled' : `oninput="saveFieldLive('${inp.id}',this.value)"`}>`;
       } else if (inp.type === 'text') {
         const val = displayInputs[inp.id] || '';
         inputsHtml += `<input type="text" class="field-input${isRedeemed ? ' frozen' : ''}" value="${esc(val)}" placeholder="${esc(inp.placeholder||'')}" ${isRedeemed ? 'disabled' : `oninput="saveFieldLive('${inp.id}',this.value)"`}>`;
