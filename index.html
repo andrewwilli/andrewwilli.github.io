@@ -846,23 +846,7 @@ function saveFieldLive(inputId, value) {
   saveCouponInput(activeCouponId, inputId, value);
   renderList();
 }
-  
-function updateRedeemedDate(inputId, value) {
-  if (!activeCouponId) return;
 
-  const s = getStore();
-  if (!s.redemptions || !s.redemptions[activeCouponId] || !s.redemptions[activeCouponId].length) return;
-
-  if (!s.redemptions[activeCouponId][0].inputs) {
-    s.redemptions[activeCouponId][0].inputs = {};
-  }
-
-  s.redemptions[activeCouponId][0].inputs[inputId] = value;
-  setStore(s);
-
-  renderList();
-  openCoupon(activeCouponId);
-}
 /* ═══════════════════════════════════════════════════
    REDEEM FLOW
    ═══════════════════════════════════════════════════ */
