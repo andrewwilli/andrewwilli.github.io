@@ -39,71 +39,59 @@ CREATE TABLE IF NOT EXISTS coupons (
                CHECK (status IN ('active', 'pending', 'rejected')),
   suggested_by TEXT NOT NULL DEFAULT 'admin'
                CHECK (suggested_by IN ('admin', 'user')),
-  sort_order   INT  NOT NULL DEFAULT 0,
   created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE OR REPLACE TRIGGER coupons_updated_at
-BEFORE UPDATE ON coupons
-FOR EACH ROW EXECUTE FUNCTION touch_updated_at();
-
 -- Seed existing coupons (idempotent)
-INSERT INTO coupons (id, emoji, title, kisses, teaser, description, note, inputs, sort_order) VALUES
+INSERT INTO coupons (id, emoji, title, kisses, teaser, description, note, inputs) VALUES
 (
   'massage', '💆‍♀️', 'Full Body Massage with Oil', 7,
   'You relax — management does all the work',
   'You can relax/sleep, pick the music (if you like) and management (me) does the work. Duration: until management''s hands are cramped or you fully fall asleep like a cat.',
   'You can tick options and focus, or leave them blank → management (me) will decide for you.',
-  '[{"id":"style","type":"pills","label":"Style (choose one)","max":1,"options":["Spicy massage","Relax massage","Mmmh-don''t-know"]},{"id":"focus","type":"pills","label":"Focus — max 2","max":2,"options":["Feet","Hands","Back","Gesäss","Legs","Shoulders"]}]',
-  1
+  '[{"id":"style","type":"pills","label":"Style (choose one)","max":1,"options":["Spicy massage","Relax massage","Mmmh-don''t-know"]},{"id":"focus","type":"pills","label":"Focus — max 2","max":2,"options":["Feet","Hands","Back","Gesäss","Legs","Shoulders"]}]'
 ),
 (
   'tshirt', '👕', 'T-Shirt of Your Choice', 20,
   'Pick any t-shirt — model it immediately',
   'You can choose and pick one shirt. No hoodie, only t-shirt! Recipient must model in it immediately. Preferably without pants — so the focus is on the shirt on your beautiful body.',
   NULL,
-  '[]',
-  2
+  '[]'
 ),
 (
-  'compliments', '💌', 'Full Day of Compliments & Love Notes', 7,
+  'compliments', '💌', 'Full Day of Compliments & Love Notes', 12,
   'A whole day of love, notes & compliments',
   'Fill in the date — for the time we are awake, this effect takes place! You cannot say "stop" or eye roll. Notes are going to be hidden during the day and if possible the day before.',
   NULL,
-  '[{"id":"date","type":"date","label":"Choose your day","countdown":true}]',
-  3
+  '[{"id":"date","type":"date","label":"Choose your day","countdown":true}]'
 ),
 (
   'datenight', '🌙', 'Date Night Planner', 30,
   'Management plans & executes a perfect date',
   'Management (me) will plan and execute a date night. The exact date will be discussed. If food is included, chef accepts "fein" and kisses as payment.',
   NULL,
-  '[{"id":"date","type":"date","label":"Preferred date (to be confirmed with management)","countdown":true}]',
-  4
+  '[{"id":"date","type":"date","label":"Preferred date (to be confirmed with management)","countdown":true}]'
 ),
 (
   'royalty', '👑', 'Royalty Treatment', 8,
   'You are officially Queen — command at will',
   'You are officially Queen — the crown from the Love Box is needed to take full effect. You can command while the crown is on your head. I will do literally everything that is possible.',
   '→ No crown, no royalty treatment.',
-  '[]',
-  5
+  '[]'
 ),
 (
   'oral', '✨', 'Oral Pleasure Focus', 9,
   '100% focus on you, no distraction, no timer',
   '100% focus on you — no distraction, no timer (unless you want). Just your pleasure! Recipient must provide feedback with moans.',
   NULL,
-  '[{"id":"surprise","type":"toggle","label":"Surprise me","hint":"Tick to have more fun — it is your choice."}]',
-  6
+  '[{"id":"surprise","type":"toggle","label":"Surprise me","hint":"Tick to have more fun — it is your choice."}]'
 ),
 (
   'sensory', '🎭', 'Blindfold, Ear Plugs & Sensory Play', 7,
   'Senses heightened — maximum teasing',
   'Senses are heightened → maximum teasing. You can tick the box you like, but there is no going back. No peeking or there will be consequences. We can have a safe word so you are still in control.',
   NULL,
-  '[{"id":"intensity","type":"pills","label":"Intensity","max":1,"options":["Mean","Normal"]},{"id":"safeword","type":"text","label":"Safe word (optional)","placeholder":"Enter your safe word…"}]',
-  7
+  '[{"id":"intensity","type":"pills","label":"Intensity","max":1,"options":["Mean","Normal"]},{"id":"safeword","type":"text","label":"Safe word (optional)","placeholder":"Enter your safe word…"}]'
 )
 ON CONFLICT (id) DO NOTHING;
 

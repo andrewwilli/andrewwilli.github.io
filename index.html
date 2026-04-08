@@ -747,7 +747,7 @@ async function loadFromSupabase() {
   const { data: st } = await _supabase.from('app_state').select('kisses').eq('id', 1).single();
   if (st) STATE.kisses = st.kisses;
 
-  // Active coupons (sorted by sort_order)
+  // Active coupons (sorted by kisses cost)
   const { data: coupons } = await _supabase.from('coupons')
     .select('*').eq('status', 'active').order('kisses');
   STATE.coupons = (coupons || []).map(_mapCoupon);
@@ -800,6 +800,7 @@ async function loadPendingSuggestions() {
 function getKisses()              { return STATE.kisses; }
 function getCouponRedemptions(id) { return STATE.redemptions[id] || []; }
 function getSavedInputs(id)       { return STATE.inputs[id] || {}; }
+function getCoupon(id)            { return STATE.coupons.find(x => x.id === id); }
 
 // ── Setters (update STATE immediately, persist to Supabase) ─────
 
@@ -808,27 +809,32 @@ function saveCouponInput(couponId, inputId, value) {
   if (!STATE.inputs[couponId]) STATE.inputs[couponId] = {};
   STATE.inputs[couponId][inputId] = value;
   _supabase.from('coupon_inputs')
-    .upsert({ coupon_id: couponId, inputs: STATE.inputs[couponId] }, { onConflict: 'coupon_id' });
+    .upsert({ coupon_id: couponId, inputs: STATE.inputs[couponId] }, { onConflict: 'coupon_id' })
+    .catch(console.error);
 }
 
 async function creditKisses(amount, note) {
-  STATE.kisses = (STATE.kisses || 0) + amount;
   const ts = Date.now();
-  STATE.log.unshift({ type: 'credit', amount, note: note || '', ts });
-  await _supabase.from('app_state').update({ kisses: STATE.kisses }).eq('id', 1);
+  const newKisses = (STATE.kisses || 0) + amount;
+  await _supabase.from('app_state').update({ kisses: newKisses }).eq('id', 1);
   await _supabase.from('activity_log').insert({ type: 'credit', amount, note: note || '', ts });
+  STATE.kisses = newKisses;
+  STATE.log.unshift({ type: 'credit', amount, note: note || '', ts });
+  if (STATE.log.length > 40) STATE.log.length = 40;
 }
 
 async function spendKisses(couponId, kissCost, inputSnapshot) {
-  STATE.kisses = Math.max(0, (STATE.kisses || 0) - kissCost);
   const ts = Date.now();
   const date = fmtDate(new Date());
+  const newKisses = Math.max(0, (STATE.kisses || 0) - kissCost);
+  await _supabase.from('app_state').update({ kisses: newKisses }).eq('id', 1);
+  await _supabase.from('redemptions').insert({ coupon_id: couponId, redeemed_date: date, ts, inputs: inputSnapshot });
+  await _supabase.from('activity_log').insert({ type: 'redeem', amount: kissCost, coupon_id: couponId, ts });
+  STATE.kisses = newKisses;
   if (!STATE.redemptions[couponId]) STATE.redemptions[couponId] = [];
   STATE.redemptions[couponId].unshift({ date, ts, inputs: inputSnapshot });
   STATE.log.unshift({ type: 'redeem', amount: kissCost, couponId, ts });
-  await _supabase.from('app_state').update({ kisses: STATE.kisses }).eq('id', 1);
-  await _supabase.from('redemptions').insert({ coupon_id: couponId, redeemed_date: date, ts, inputs: inputSnapshot });
-  await _supabase.from('activity_log').insert({ type: 'redeem', amount: kissCost, coupon_id: couponId, ts });
+  if (STATE.log.length > 40) STATE.log.length = 40;
 }
 
 async function resetCouponHistory(couponId) {
@@ -871,32 +877,59 @@ function fmtInputSummary(coupon, inputs) {
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 /* ═══════════════════════════════════════════════════
-   PIN
+   PIN PAD FACTORY
    ═══════════════════════════════════════════════════ */
-var pinVal = '';
-function pinKey(d) {
-  if (pinVal.length >= 6) return;
-  pinVal += d;
-  renderDots();
-  if (pinVal.length === 6) setTimeout(checkPin, 120);
-}
-function pinDel() { pinVal = pinVal.slice(0,-1); renderDots(); }
-function renderDots() {
-  document.querySelectorAll('#pin-dots .pin-dot').forEach((el,i) => el.classList.toggle('on', i < pinVal.length));
-}
-function checkPin() {
-  if (pinVal === USER_PIN) {
-    localStorage.setItem('lc_unlocked', '1'); // remember this device
-    hidePinScreen(); enterUserMode();
-  } else if (pinVal === ADMIN_PIN) { hidePinScreen(); enterAdminMode(); }
-  else {
-    pinVal = ''; renderDots();
-    document.getElementById('pin-error').textContent = 'Wrong code — try again';
-    const d = document.getElementById('pin-dots');
-    d.classList.add('shake');
-    setTimeout(() => { d.classList.remove('shake'); document.getElementById('pin-error').textContent = ''; }, 400);
+function makePinPad({ dotsId, errorId, maxLen, onSuccess }) {
+  let val = '';
+  function renderDots() {
+    document.querySelectorAll('#' + dotsId + ' .pin-dot')
+      .forEach((el, i) => el.classList.toggle('on', i < val.length));
   }
+  function check() {
+    const accepted = onSuccess(val);
+    val = '';
+    if (!accepted) {
+      renderDots();
+      const errEl = document.getElementById(errorId);
+      errEl.textContent = 'Wrong code — try again';
+      const dotsEl = document.getElementById(dotsId);
+      dotsEl.classList.add('shake');
+      setTimeout(() => { dotsEl.classList.remove('shake'); errEl.textContent = ''; }, 400);
+    }
+  }
+  return {
+    key(d) { if (val.length >= maxLen) return; val += d; renderDots(); if (val.length === maxLen) setTimeout(check, 120); },
+    del()  { val = val.slice(0, -1); renderDots(); },
+    reset(){ val = ''; renderDots(); }
+  };
 }
+
+const _userPad = makePinPad({
+  dotsId: 'pin-dots', errorId: 'pin-error', maxLen: 6,
+  onSuccess(val) {
+    if (val === USER_PIN)  { localStorage.setItem('lc_unlocked', '1'); hidePinScreen(); enterUserMode();  return true; }
+    if (val === ADMIN_PIN) { hidePinScreen(); enterAdminMode(); return true; }
+    return false;
+  }
+});
+function pinKey(d) { _userPad.key(d); }
+function pinDel()  { _userPad.del(); }
+
+const _adminPad = makePinPad({
+  dotsId: 'admin-pin-dots', errorId: 'admin-pin-error', maxLen: 6,
+  onSuccess(val) {
+    if (val === ADMIN_PIN) {
+      hideAdminPinOverlay();
+      document.getElementById('quick-open-screen').style.display = 'none';
+      enterAdminMode();
+      return true;
+    }
+    return false;
+  }
+});
+function adminPinKey(d) { _adminPad.key(d); }
+function adminPinDel()  { _adminPad.del(); }
+
 function hidePinScreen() {
   const ps = document.getElementById('pin-screen');
   ps.classList.add('out');
@@ -933,47 +966,14 @@ function cancelAdminLongPress() {
 }
 
 function showAdminPinOverlay() {
-  _adminPinVal = '';
-  _renderAdminPinDots();
+  _adminPad.reset();
   document.getElementById('admin-pin-error').textContent = '';
   document.getElementById('admin-pin-overlay').classList.add('on');
 }
 
 function hideAdminPinOverlay() {
   document.getElementById('admin-pin-overlay').classList.remove('on');
-  _adminPinVal = '';
-}
-
-/* ─── Admin overlay PIN logic ─── */
-let _adminPinVal = '';
-
-function adminPinKey(d) {
-  if (_adminPinVal.length >= 6) return;
-  _adminPinVal += d;
-  _renderAdminPinDots();
-  if (_adminPinVal.length === 6) setTimeout(_checkAdminPinOverlay, 120);
-}
-
-function adminPinDel() { _adminPinVal = _adminPinVal.slice(0, -1); _renderAdminPinDots(); }
-
-function _renderAdminPinDots() {
-  document.querySelectorAll('#admin-pin-dots .pin-dot')
-    .forEach((el, i) => el.classList.toggle('on', i < _adminPinVal.length));
-}
-
-function _checkAdminPinOverlay() {
-  if (_adminPinVal === ADMIN_PIN) {
-    hideAdminPinOverlay();
-    document.getElementById('quick-open-screen').style.display = 'none';
-    enterAdminMode();
-  } else {
-    _adminPinVal = '';
-    _renderAdminPinDots();
-    document.getElementById('admin-pin-error').textContent = 'Wrong code — try again';
-    const d = document.getElementById('admin-pin-dots');
-    d.classList.add('shake');
-    setTimeout(() => { d.classList.remove('shake'); document.getElementById('admin-pin-error').textContent = ''; }, 400);
-  }
+  _adminPad.reset();
 }
 
 /* ═══════════════════════════════════════════════════
@@ -1010,7 +1010,7 @@ function exitAdmin() {
     document.getElementById('quick-open-screen').style.display = 'flex';
   } else {
     // Return to PIN screen
-    pinVal = ''; renderDots();
+    _userPad.reset();
     document.getElementById('pin-error').textContent = '';
     document.getElementById('pin-screen').style.display = '';
     document.getElementById('pin-screen').classList.remove('out');
@@ -1110,7 +1110,7 @@ let activeCouponId = null;
 
 function openCoupon(id) {
   activeCouponId = id;
-  const c = STATE.coupons.find(x => x.id === id);
+  const c = getCoupon(id);
   const kisses = getKisses();
   const canAfford = kisses >= c.kisses;
   const savedInputs = getSavedInputs(id);
@@ -1263,7 +1263,7 @@ function saveFieldLive(inputId, value) {
    REDEEM FLOW
    ═══════════════════════════════════════════════════ */
 function startRedeem() {
-  const c = STATE.coupons.find(x => x.id === activeCouponId);
+  const c = getCoupon(activeCouponId);
   const detail = fmtInputSummary(c, getSavedInputs(activeCouponId));
   document.getElementById('confirm-body').innerHTML =
     `Give Andrew <strong>${c.kisses} kiss${c.kisses!==1?'es':''}</strong> to redeem<br>"${c.title}".` +
@@ -1273,7 +1273,7 @@ function startRedeem() {
 function closeConfirm() { document.getElementById('confirm').classList.remove('on'); }
 
 async function doRedeem() {
-  const c = STATE.coupons.find(x => x.id === activeCouponId);
+  const c = getCoupon(activeCouponId);
   await spendKisses(activeCouponId, c.kisses, getSavedInputs(activeCouponId));
   closeConfirm();
   closeModal();
@@ -1508,7 +1508,7 @@ async function adminAddKisses() {
 }
 
 async function adminReset(couponId) {
-  const c = STATE.coupons.find(x => x.id === couponId);
+  const c = getCoupon(couponId);
   if (!confirm(`Reset all redemptions for "${c.title}"?\n\nThis cannot be undone.`)) return;
   await resetCouponHistory(couponId);
   renderAdmin();
@@ -1546,7 +1546,7 @@ let _editorCoupon = null;
 let _editorInputs = [];
 
 function openCouponEditor(couponIdOrNull) {
-  const c = couponIdOrNull ? STATE.coupons.find(x => x.id === couponIdOrNull) : null;
+  const c = getCoupon(couponIdOrNull);
   _editorCoupon = c;
   _editorInputs = c ? JSON.parse(JSON.stringify(c.inputs || [])) : [];
 
@@ -1675,9 +1675,8 @@ async function saveCouponFromEditor() {
   } else {
     const id = title.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')
                + '_' + Date.now().toString(36);
-    const sort_order = STATE.coupons.length;
     const { data: created, error } = await _supabase.from('coupons')
-      .insert({ id, ...payload, sort_order }).select().single();
+      .insert({ id, ...payload }).select().single();
     if (error) { alert('Error saving coupon: ' + error.message); return; }
     if (created) STATE.coupons.push(_mapCoupon(created));
   }
@@ -1702,12 +1701,11 @@ async function approveSuggestion(id) {
   const input = prompt(`Approve "${sug.title}" — how many kisses should it cost?`);
   const kisses = parseInt(input);
   if (!kisses || kisses < 1) return;
-  const sort_order = STATE.coupons.length;
   await _supabase.from('coupons')
-    .update({ status: 'active', kisses, sort_order }).eq('id', id);
+    .update({ status: 'active', kisses }).eq('id', id);
   STATE.suggestions = STATE.suggestions.filter(s => s.id !== id);
   const { data: fresh } = await _supabase.from('coupons')
-    .select('*').eq('status','active').order('sort_order');
+    .select('*').eq('status','active').order('kisses');
   STATE.coupons = (fresh || []).map(_mapCoupon);
   renderAdmin();
 }
@@ -1745,7 +1743,7 @@ async function submitSuggestion() {
   const id = 'suggest_' + Date.now().toString(36);
   const { error } = await _supabase.from('coupons').insert({
     id, emoji, title, description: desc, teaser: desc.slice(0,80),
-    kisses: 0, inputs: [], status: 'pending', suggested_by: 'user', sort_order: 999
+    kisses: 0, inputs: [], status: 'pending', suggested_by: 'user'
   });
   if (error) { alert('Could not send — try again!'); return; }
   closeSuggestForm();
