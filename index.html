@@ -749,7 +749,7 @@ async function loadFromSupabase() {
 
   // Active coupons (sorted by sort_order)
   const { data: coupons } = await _supabase.from('coupons')
-    .select('*').eq('status', 'active').order('sort_order');
+    .select('*').eq('status', 'active').order('kisses');
   STATE.coupons = (coupons || []).map(_mapCoupon);
 
   // Saved coupon inputs (draft selections before redemption)
@@ -783,7 +783,7 @@ async function loadFromSupabase() {
   _supabase.channel('coupons-live')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'coupons' }, async () => {
       const { data: fresh } = await _supabase.from('coupons')
-        .select('*').eq('status', 'active').order('sort_order');
+        .select('*').eq('status', 'active').order('kisses');
       STATE.coupons = (fresh || []).map(_mapCoupon);
       renderList();
     })
@@ -1037,7 +1037,7 @@ function couponTier(kisses) {
   if (kisses <= 20) return 2;
   return 3;
 }
-const TIER_LABELS = { 1: '', 2: '💕 Romantic', 3: '🔥 Spicy' };
+const TIER_LABELS = { 1: '', 2: '🌟 Premium', 3: '👑 Executive' };
 
 /* ═══════════════════════════════════════════════════
    COUPON LIST
@@ -1426,7 +1426,7 @@ function renderAdmin() {
     }
 
     const tier = couponTier(c.kisses);
-    const tierDot = tier === 3 ? ' 🔥' : tier === 2 ? ' 💕' : '';
+    const tierDot = tier === 3 ? ' 👑' : tier === 2 ? ' 🌟' : '';
 
     return `<div class="admin-coupon">
       <div class="admin-coupon-head">
