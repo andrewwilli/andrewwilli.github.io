@@ -520,7 +520,7 @@ const TC_ITEMS = [
    project URL and anon key from:
    Supabase Dashboard → Project Settings → API
    ═══════════════════════════════════════════════════ */
-const SUPABASE_URL      = 'ttps://bjyrmrhboggzqcvzzwbj.supabase.co';
+const SUPABASE_URL      = 'https://bjyrmrhboggzqcvzzwbj.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqeXJtcmhib2dnenFjdnp6d2JqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2MzMwNzAsImV4cCI6MjA5MTIwOTA3MH0.eBCj6zlWoR2bmmeXPTRtP1uGg0E9xzLGGktX3Q9ot00';
 
 const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -645,7 +645,7 @@ function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').re
 /* ═══════════════════════════════════════════════════
    PIN
    ═══════════════════════════════════════════════════ */
-let pinVal = '';
+var pinVal = '';
 function pinKey(d) {
   if (pinVal.length >= 6) return;
   pinVal += d;
