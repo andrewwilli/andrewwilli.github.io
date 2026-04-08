@@ -298,6 +298,104 @@
     }
     .loading-heart { font-size: 40px; animation: float 1.5s ease-in-out infinite; }
     .loading-text  { font-size: 13px; color: rgba(255,255,255,0.55); margin-top: 12px; font-weight: 300; }
+
+    /* ─── COUPON TIERS ───────────────────────────────────────────
+       Tier 1: ≤10 kisses — Sweet   (teal, current)
+       Tier 2: 11–20 kisses — Romantic (rose-pink)
+       Tier 3: 21+ kisses  — Spicy    (deep red)
+    ──────────────────────────────────────────────────────────── */
+    .tier-1 .card-bar { background: linear-gradient(90deg,#2a5955,#4a8878); height:3px; }
+    .tier-1 .kiss-pill { background:var(--gold-bg); color:#8a6235; }
+
+    .tier-2 { box-shadow:0 1px 8px rgba(175,60,110,.12),0 4px 16px rgba(0,0,0,.05); }
+    .tier-2 .card-bar { background:linear-gradient(90deg,#b54070,#d46094); height:4px; }
+    .tier-2 .kiss-pill { background:#fce8f2; color:#8a1a55; }
+    .tier-2 .card-title { color:#3a0820; }
+    .tier-2 .kiss-pill.cant { background:#f5e0ec; color:#8a1a55; }
+
+    .tier-3 { box-shadow:0 2px 12px rgba(175,20,45,.18),0 6px 24px rgba(0,0,0,.07); }
+    .tier-3 .card-bar { background:linear-gradient(90deg,#8a1020,#c42040); height:5px; }
+    .tier-3 .kiss-pill { background:#fde8ea; color:#7a0a1c; }
+    .tier-3 .card-title { color:#2a0008; }
+    .tier-3 .kiss-pill.cant { background:#f5e0e2; color:#7a0a1c; }
+
+    .tier-tag { display:inline-flex; align-items:center; gap:3px; font-size:10px; font-weight:600;
+                letter-spacing:.05em; padding:3px 8px; border-radius:10px; }
+    .tier-2 .tier-tag { background:#fce8f2; color:#8a1a55; }
+    .tier-3 .tier-tag { background:#fde8ea; color:#7a0a1c; }
+
+    /* ─── SUGGEST BUTTON ─────────────────────────────────────── */
+    .suggest-wrap { padding:4px 0 28px; text-align:center; }
+    .suggest-btn  { background:transparent; border:1.5px dashed var(--border);
+                    border-radius:var(--r); color:var(--text-muted); font-size:13px;
+                    font-family:'Inter',sans-serif; padding:13px 20px; width:100%;
+                    cursor:pointer; -webkit-tap-highlight-color:transparent;
+                    touch-action:manipulation; transition:background .15s ease; }
+    .suggest-btn:active { background:var(--bg); }
+
+    /* ─── SUGGEST MODAL ──────────────────────────────────────── */
+    #suggest-overlay { position:fixed; inset:0; background:rgba(0,0,0,.38); z-index:220;
+                       opacity:0; pointer-events:none; transition:opacity .28s ease; }
+    #suggest-overlay.on { opacity:1; pointer-events:all; }
+    #suggest-modal { position:fixed; bottom:0; left:0; right:0; background:var(--card);
+                     border-radius:22px 22px 0 0; z-index:221; transform:translateY(100%);
+                     transition:transform .34s cubic-bezier(.32,.72,0,1); }
+    #suggest-modal.on { transform:translateY(0); }
+
+    /* ─── COUPON EDITOR (admin) ──────────────────────────────── */
+    #coupon-editor { position:fixed; inset:0; z-index:550; background:var(--bg);
+                     opacity:0; pointer-events:none; transition:opacity .3s ease;
+                     display:flex; flex-direction:column; }
+    #coupon-editor.on { opacity:1; pointer-events:all; }
+    .editor-header { background:var(--primary-dark); padding:14px 20px 16px;
+                     padding-top:max(14px,env(safe-area-inset-top)); flex-shrink:0;
+                     display:flex; align-items:center; gap:14px; }
+    .editor-back { color:rgba(255,255,255,.7); font-size:22px; cursor:pointer;
+                   padding:4px 8px 4px 0; -webkit-tap-highlight-color:transparent; line-height:1; }
+    .editor-header-title { font-family:'Playfair Display',serif; font-size:19px;
+                           font-weight:400; color:white; flex:1; }
+    .editor-scroll { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
+                     padding:20px 16px; padding-bottom:max(36px,env(safe-area-inset-bottom)); }
+    .editor-field  { margin-bottom:16px; }
+    .editor-label  { font-size:11px; font-weight:600; text-transform:uppercase;
+                     letter-spacing:.1em; color:var(--primary); margin-bottom:6px; display:block; }
+    .editor-emoji-row { display:flex; gap:10px; }
+    .editor-emoji-input { width:70px; text-align:center; font-size:22px; }
+    .editor-input-row { background:var(--bg); border-radius:var(--r-sm); padding:12px; margin-bottom:10px; }
+    .add-input-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+    .add-input-btn { padding:6px 12px; background:rgba(42,89,85,.1); color:var(--primary);
+                     border:none; border-radius:10px; font-size:12px; font-family:'Inter',sans-serif;
+                     cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    .editor-save-btn { width:100%; padding:15px; background:var(--primary); color:white; border:none;
+                       border-radius:var(--r); font-size:15px; font-family:'Inter',sans-serif;
+                       font-weight:500; cursor:pointer; margin-top:8px; }
+    .editor-delete-btn { width:100%; padding:13px; background:transparent;
+                         border:1.5px solid #e8d8d8; color:#b05050; border-radius:var(--r);
+                         font-size:14px; font-family:'Inter',sans-serif; cursor:pointer; margin-top:10px; }
+
+    /* ─── PENDING SUGGESTIONS (admin) ───────────────────────── */
+    .suggestion-card { background:var(--card); border-radius:var(--r); padding:14px 16px;
+                       margin-bottom:10px; border-left:3px solid var(--gold); }
+    .suggestion-head { display:flex; align-items:flex-start; gap:10px; margin-bottom:8px; }
+    .suggestion-emoji { font-size:24px; flex-shrink:0; }
+    .suggestion-title { font-size:14px; font-weight:500; color:var(--text); flex:1; }
+    .suggestion-desc  { font-size:12px; color:var(--text-muted); margin-bottom:12px; line-height:1.5; }
+    .suggestion-actions { display:flex; gap:8px; }
+    .approve-btn { flex:1; padding:9px; background:var(--primary); color:white; border:none;
+                   border-radius:var(--r-sm); font-size:13px; font-family:'Inter',sans-serif;
+                   font-weight:500; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+    .reject-btn  { padding:9px 16px; background:#f5e8e8; color:#b05050; border:none;
+                   border-radius:var(--r-sm); font-size:13px; font-family:'Inter',sans-serif;
+                   cursor:pointer; -webkit-tap-highlight-color:transparent; }
+
+    /* ─── ADMIN COUPON EDIT BTN ──────────────────────────────── */
+    .edit-btn { font-size:11px; color:var(--primary); background:rgba(42,89,85,.1); border:none;
+                border-radius:10px; padding:4px 10px; cursor:pointer; font-family:'Inter',sans-serif;
+                -webkit-tap-highlight-color:transparent; flex-shrink:0; }
+    .new-coupon-btn { width:100%; padding:12px; background:transparent;
+                      border:1.5px dashed rgba(42,89,85,.35); border-radius:var(--r-sm);
+                      color:var(--primary); font-size:13px; font-family:'Inter',sans-serif;
+                      cursor:pointer; margin-top:10px; -webkit-tap-highlight-color:transparent; }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
@@ -425,6 +523,83 @@
   <div class="hint-close" onclick="dismissHint()">✕</div>
 </div>
 
+<!-- SUGGEST OVERLAY + MODAL -->
+<div id="suggest-overlay" onclick="closeSuggestForm()"></div>
+<div id="suggest-modal">
+  <div class="modal-grip"></div>
+  <div class="modal-body">
+    <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:600;margin-bottom:4px;">Got a coupon idea? 💡</div>
+    <div style="font-size:13px;color:var(--text-muted);margin-bottom:20px;font-weight:300;">Andrew will set the kiss cost and add it if he loves it.</div>
+    <div class="input-group">
+      <span class="section-label">Emoji</span>
+      <input type="text" id="suggest-emoji" class="field-input editor-emoji-input" value="💋" maxlength="4">
+    </div>
+    <div class="input-group">
+      <span class="section-label">Title</span>
+      <input type="text" id="suggest-title" class="field-input" placeholder="What should the coupon be called?">
+    </div>
+    <div class="input-group">
+      <span class="section-label">Description</span>
+      <textarea id="suggest-desc" class="field-input" rows="3" style="resize:none;" placeholder="What happens when you redeem it?"></textarea>
+    </div>
+    <button class="redeem-btn" onclick="submitSuggestion()">Send idea to Andrew 💌</button>
+    <div style="text-align:center;margin-top:12px;">
+      <span style="font-size:12px;color:var(--text-muted);cursor:pointer;padding:8px;" onclick="closeSuggestForm()">Cancel</span>
+    </div>
+  </div>
+</div>
+
+<!-- COUPON EDITOR (admin) -->
+<div id="coupon-editor">
+  <div class="editor-header">
+    <span class="editor-back" onclick="closeCouponEditor()">←</span>
+    <div class="editor-header-title" id="editor-title">New Coupon</div>
+  </div>
+  <div class="editor-scroll">
+    <div class="editor-field editor-emoji-row">
+      <div style="flex:0 0 auto;">
+        <span class="editor-label">Emoji</span>
+        <input type="text" id="editor-emoji" class="field-input editor-emoji-input" maxlength="4">
+      </div>
+      <div style="flex:1;">
+        <span class="editor-label">Title</span>
+        <input type="text" id="editor-name" class="field-input" placeholder="Coupon name…">
+      </div>
+    </div>
+    <div class="editor-field">
+      <span class="editor-label">Kisses cost</span>
+      <input type="number" id="editor-kisses" class="field-input" placeholder="e.g. 7" min="1" max="999">
+    </div>
+    <div class="editor-field">
+      <span class="editor-label">Teaser (short preview)</span>
+      <input type="text" id="editor-teaser" class="field-input" placeholder="One-liner shown on the card…">
+    </div>
+    <div class="editor-field">
+      <span class="editor-label">Description</span>
+      <textarea id="editor-desc" class="field-input" rows="4" style="resize:none;" placeholder="Full description shown in the modal…"></textarea>
+    </div>
+    <div class="editor-field">
+      <span class="editor-label">Note (optional)</span>
+      <input type="text" id="editor-note" class="field-input" placeholder="Extra note shown in italic box…">
+    </div>
+
+    <div class="editor-field">
+      <span class="editor-label">Custom Options / Inputs</span>
+      <div id="editor-inputs-list"></div>
+      <div class="add-input-row">
+        <button class="add-input-btn" onclick="addEditorInput('pills')">+ Pill choices</button>
+        <button class="add-input-btn" onclick="addEditorInput('date')">+ Date picker</button>
+        <button class="add-input-btn" onclick="addEditorInput('toggle')">+ Toggle</button>
+        <button class="add-input-btn" onclick="addEditorInput('text')">+ Text field</button>
+      </div>
+    </div>
+
+    <button class="editor-save-btn" onclick="saveCouponFromEditor()">Save Coupon</button>
+    <button class="editor-delete-btn" id="editor-delete-btn" onclick="deleteCouponFromEditor()" style="display:none;">Delete Coupon</button>
+    <div style="height:20px;"></div>
+  </div>
+</div>
+
 <script>
 'use strict';
 
@@ -436,73 +611,10 @@ const USER_PIN  = '121222';   // Ainu's PIN
 const ADMIN_PIN = '195642';   // Andrew's admin PIN
 
 /* ═══════════════════════════════════════════════════
-   COUPON DATA
+   COUPON DATA  — loaded from Supabase at startup
+   Coupons live in the `coupons` table (see schema.sql).
+   STATE.coupons is populated in loadFromSupabase().
    ═══════════════════════════════════════════════════ */
-const COUPONS = [
-  {
-    id: 'massage', emoji: '💆‍♀️',
-    title: 'Full Body Massage with Oil', kisses: 7,
-    teaser: 'You relax — management does all the work',
-    desc: 'You can relax/sleep, pick the music (if you like) and management (me) does the work. Duration: until management\'s hands are cramped or you fully fall asleep like a cat.',
-    note: 'You can tick options and focus, or leave them blank → management (me) will decide for you.',
-    inputs: [
-      { id: 'style', type: 'pills', label: 'Style (choose one)', max: 1, options: ['Spicy massage', 'Relax massage', 'Mmmh-don\'t-know'] },
-      { id: 'focus', type: 'pills', label: 'Focus — max 2', max: 2, options: ['Feet', 'Hands', 'Back', 'Gesäss', 'Legs', 'Shoulders'] }
-    ]
-  },
-  {
-    id: 'tshirt', emoji: '👕',
-    title: 'T-Shirt of Your Choice', kisses: 20,
-    teaser: 'Pick any t-shirt — model it immediately',
-    desc: 'You can choose and pick one shirt. No hoodie, only t-shirt! Recipient must model in it immediately. Preferably without pants — so the focus is on the shirt on your beautiful body.',
-    inputs: []
-  },
-  {
-    id: 'compliments', emoji: '💌',
-    title: 'Full Day of Compliments & Love Notes', kisses: 7,
-    teaser: 'A whole day of love, notes & compliments',
-    desc: 'Fill in the date — for the time we are awake, this effect takes place! You cannot say "stop" or eye roll. Notes are going to be hidden during the day and if possible the day before.',
-    inputs: [
-      { id: 'date', type: 'date', label: 'Choose your day', countdown: true }
-    ]
-  },
-  {
-    id: 'datenight', emoji: '🌙',
-    title: 'Date Night Planner', kisses: 30,
-    teaser: 'Management plans & executes a perfect date',
-    desc: 'Management (me) will plan and execute a date night. The exact date will be discussed. If food is included, chef accepts "fein" and kisses as payment.',
-    inputs: [
-      { id: 'date', type: 'date', label: 'Preferred date (to be confirmed with management)', countdown: true }
-    ]
-  },
-  {
-    id: 'royalty', emoji: '👑',
-    title: 'Royalty Treatment', kisses: 8,
-    teaser: 'You are officially Queen — command at will',
-    desc: 'You are officially Queen — the crown from the Love Box is needed to take full effect. You can command while the crown is on your head. I will do literally everything that is possible.',
-    note: '→ No crown, no royalty treatment.',
-    inputs: []
-  },
-  {
-    id: 'oral', emoji: '✨',
-    title: 'Oral Pleasure Focus', kisses: 9,
-    teaser: '100% focus on you, no distraction, no timer',
-    desc: '100% focus on you — no distraction, no timer (unless you want). Just your pleasure! Recipient must provide feedback with moans.',
-    inputs: [
-      { id: 'surprise', type: 'toggle', label: 'Surprise me', hint: 'Tick to have more fun — it is your choice.' }
-    ]
-  },
-  {
-    id: 'sensory', emoji: '🎭',
-    title: 'Blindfold, Ear Plugs & Sensory Play', kisses: 7,
-    teaser: 'Senses heightened — maximum teasing',
-    desc: 'Senses are heightened → maximum teasing. You can tick the box you like, but there is no going back. No peeking or there will be consequences. We can have a safe word so you are still in control.',
-    inputs: [
-      { id: 'intensity', type: 'pills', label: 'Intensity', max: 1, options: ['Mean', 'Normal'] },
-      { id: 'safeword', type: 'text', label: 'Safe word (optional)', placeholder: 'Enter your safe word…' }
-    ]
-  }
-];
 
 const TC_ITEMS = [
   'Must be redeemed with kisses (number of kisses written on the coupon — or ask your lovely boyfriend).',
@@ -532,12 +644,21 @@ const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
    (reads from STATE); setters are async (write to
    both STATE and Supabase).
    ═══════════════════════════════════════════════════ */
-let STATE = { kisses: 0, inputs: {}, redemptions: {}, log: [] };
+let STATE = { kisses: 0, inputs: {}, redemptions: {}, log: [], coupons: [], suggestions: [] };
+
+function _mapCoupon(c) {
+  return { ...c, desc: c.description, inputs: c.inputs || [] };
+}
 
 async function loadFromSupabase() {
   // Kiss balance
   const { data: st } = await _supabase.from('app_state').select('kisses').eq('id', 1).single();
   if (st) STATE.kisses = st.kisses;
+
+  // Active coupons (sorted by sort_order)
+  const { data: coupons } = await _supabase.from('coupons')
+    .select('*').eq('status', 'active').order('sort_order');
+  STATE.coupons = (coupons || []).map(_mapCoupon);
 
   // Saved coupon inputs (draft selections before redemption)
   const { data: inputs } = await _supabase.from('coupon_inputs').select('coupon_id, inputs');
@@ -556,7 +677,7 @@ async function loadFromSupabase() {
   const { data: log } = await _supabase.from('activity_log').select('*').order('ts', { ascending: false }).limit(40);
   STATE.log = (log || []).map(r => ({ type: r.type, amount: r.amount, note: r.note, couponId: r.coupon_id, ts: r.ts }));
 
-  // Realtime: refresh balance the moment Andrew approves kisses remotely
+  // Realtime: refresh balance + coupons list live
   _supabase.channel('balance')
     .on('postgres_changes',
       { event: 'UPDATE', schema: 'public', table: 'app_state', filter: 'id=eq.1' },
@@ -566,6 +687,21 @@ async function loadFromSupabase() {
         renderList();
       })
     .subscribe();
+
+  _supabase.channel('coupons-live')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'coupons' }, async () => {
+      const { data: fresh } = await _supabase.from('coupons')
+        .select('*').eq('status', 'active').order('sort_order');
+      STATE.coupons = (fresh || []).map(_mapCoupon);
+      renderList();
+    })
+    .subscribe();
+}
+
+async function loadPendingSuggestions() {
+  const { data } = await _supabase.from('coupons')
+    .select('*').eq('status', 'pending').order('created_at');
+  STATE.suggestions = data || [];
 }
 
 // ── Sync getters (read from in-memory STATE) ────────────────────
@@ -695,7 +831,8 @@ function showApp() {
   document.getElementById('app').classList.add('on');
   maybeShowInstallHint();
 }
-function enterAdminMode() {
+async function enterAdminMode() {
+  await loadPendingSuggestions();
   renderAdmin();
   document.getElementById('admin-panel').classList.add('on');
 }
@@ -721,11 +858,24 @@ function updateBalanceDisplay() {
 }
 
 /* ═══════════════════════════════════════════════════
+   COUPON TIERS
+   ═══════════════════════════════════════════════════ */
+function couponTier(kisses) {
+  if (kisses <= 10) return 1;
+  if (kisses <= 20) return 2;
+  return 3;
+}
+const TIER_LABELS = { 1: '', 2: '💕 Romantic', 3: '🔥 Spicy' };
+
+/* ═══════════════════════════════════════════════════
    COUPON LIST
    ═══════════════════════════════════════════════════ */
 function renderList() {
   const kisses = getKisses();
-  document.getElementById('coupon-list').innerHTML = COUPONS.map(c => {
+  const coupons = STATE.coupons;
+
+  let html = coupons.map(c => {
+    const tier = couponTier(c.kisses);
     const redemptions = getCouponRedemptions(c.id);
     const count = redemptions.length;
     const savedInputs = getSavedInputs(c.id);
@@ -733,14 +883,14 @@ function renderList() {
 
     // countdown badge
     let countdownHtml = '';
-    c.inputs.forEach(inp => {
+    (c.inputs || []).forEach(inp => {
       if (inp.countdown && savedInputs[inp.id]) {
         const lbl = countdownLabel(daysUntil(savedInputs[inp.id]));
         if (lbl) countdownHtml = `<span class="countdown-tag ${lbl.cls}">${lbl.text}</span>`;
       }
     });
 
-    const isRedeemed = count > 0; // single-use: any redemption = used
+    const isRedeemed = count > 0;
     const cardClass = isRedeemed ? ' redeemed' : (!canAfford ? ' locked' : '');
     const pillCls = (!isRedeemed && !canAfford) ? ' cant' : '';
     const pillTxt = (!isRedeemed && !canAfford)
@@ -750,26 +900,35 @@ function renderList() {
     const redeemedLine = isRedeemed
       ? `<span class="redeemed-tag">Redeemed · ${redemptions[0].date}</span>`
       : '';
+    const tierTag = (!isRedeemed && tier > 1)
+      ? `<span class="tier-tag">${TIER_LABELS[tier]}</span>`
+      : '';
 
     return `
-      <div class="coupon-card${cardClass}" onclick="openCoupon('${c.id}')">
+      <div class="coupon-card${cardClass} tier-${tier}" onclick="openCoupon('${c.id}')">
         <div class="card-bar"></div>
         <div class="card-inner">
           <div class="card-emoji">${c.emoji}</div>
           <div class="card-body">
-            <div class="card-title">${c.title}</div>
-            <div class="card-teaser">${c.teaser}</div>
+            <div class="card-title">${esc(c.title)}</div>
+            <div class="card-teaser">${esc(c.teaser)}</div>
             <div class="card-footer">
               <span class="kiss-pill${pillCls}">${pillTxt}</span>
               <div class="card-tags">
                 ${redeemedLine}
-                ${!isRedeemed ? countdownHtml : ''}
+                ${!isRedeemed ? (countdownHtml || tierTag) : ''}
               </div>
             </div>
           </div>
         </div>
       </div>`;
   }).join('');
+
+  html += `<div class="suggest-wrap">
+    <button class="suggest-btn" onclick="openSuggestForm()">💡 Got a coupon idea? Suggest it →</button>
+  </div>`;
+
+  document.getElementById('coupon-list').innerHTML = html;
 }
 
 /* ═══════════════════════════════════════════════════
@@ -779,7 +938,7 @@ let activeCouponId = null;
 
 function openCoupon(id) {
   activeCouponId = id;
-  const c = COUPONS.find(x => x.id === id);
+  const c = STATE.coupons.find(x => x.id === id);
   const kisses = getKisses();
   const canAfford = kisses >= c.kisses;
   const savedInputs = getSavedInputs(id);
@@ -932,7 +1091,7 @@ function saveFieldLive(inputId, value) {
    REDEEM FLOW
    ═══════════════════════════════════════════════════ */
 function startRedeem() {
-  const c = COUPONS.find(x => x.id === activeCouponId);
+  const c = STATE.coupons.find(x => x.id === activeCouponId);
   const detail = fmtInputSummary(c, getSavedInputs(activeCouponId));
   document.getElementById('confirm-body').innerHTML =
     `Give Andrew <strong>${c.kisses} kiss${c.kisses!==1?'es':''}</strong> to redeem<br>"${c.title}".` +
@@ -942,7 +1101,7 @@ function startRedeem() {
 function closeConfirm() { document.getElementById('confirm').classList.remove('on'); }
 
 async function doRedeem() {
-  const c = COUPONS.find(x => x.id === activeCouponId);
+  const c = STATE.coupons.find(x => x.id === activeCouponId);
   await spendKisses(activeCouponId, c.kisses, getSavedInputs(activeCouponId));
   closeConfirm();
   closeModal();
@@ -1044,10 +1203,33 @@ function hideTC() { document.getElementById('tc-screen').classList.remove('on');
    ADMIN PANEL
    ═══════════════════════════════════════════════════ */
 function renderAdmin() {
-  const kisses = STATE.kisses || 0;
-  const log = STATE.log || [];
+  const kisses    = STATE.kisses || 0;
+  const log       = STATE.log || [];
+  const coupons   = STATE.coupons || [];
+  const suggestions = STATE.suggestions || [];
 
-  const couponRows = COUPONS.map(c => {
+  /* ── Pending suggestions section ── */
+  let suggestionsHtml = '';
+  if (suggestions.length) {
+    suggestionsHtml = `<div class="admin-section">
+      <div class="admin-section-title">Pending Suggestions (${suggestions.length})</div>
+      ${suggestions.map(s => `
+        <div class="suggestion-card">
+          <div class="suggestion-head">
+            <div class="suggestion-emoji">${esc(s.emoji)}</div>
+            <div class="suggestion-title">${esc(s.title)}</div>
+          </div>
+          ${s.description ? `<div class="suggestion-desc">${esc(s.description)}</div>` : ''}
+          <div class="suggestion-actions">
+            <button class="approve-btn" onclick="approveSuggestion('${s.id}')">✓ Approve &amp; set cost</button>
+            <button class="reject-btn"  onclick="rejectSuggestion('${s.id}')">✗ Reject</button>
+          </div>
+        </div>`).join('')}
+    </div>`;
+  }
+
+  /* ── Coupon rows ── */
+  const couponRows = coupons.map(c => {
     const redemptions = (STATE.redemptions || {})[c.id] || [];
     const count = redemptions.length;
     const lastDate = count ? redemptions[0].date : null;
@@ -1057,31 +1239,28 @@ function renderAdmin() {
     if (count > 0) {
       const redeemedInputs = redemptions[0].inputs || {};
       const dateInput = (c.inputs || []).find(inp => inp.type === 'date');
-
       if (dateInput) {
         const val = redeemedInputs[dateInput.id] || '';
         const today = new Date();
         today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
         const minDate = today.toISOString().split('T')[0];
-
         adminDateEditor = `
           <div style="margin-top:8px;">
             <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">Change redeemed date</div>
-            <input
-              type="date"
-              class="field-input"
-              value="${esc(val)}"
-              min="${minDate}"
+            <input type="date" class="field-input" value="${esc(val)}" min="${minDate}"
               oninput="adminUpdateRedeemedDate('${c.id}', '${dateInput.id}', this.value)">
-          </div>
-        `;
+          </div>`;
       }
     }
 
+    const tier = couponTier(c.kisses);
+    const tierDot = tier === 3 ? ' 🔥' : tier === 2 ? ' 💕' : '';
+
     return `<div class="admin-coupon">
       <div class="admin-coupon-head">
-        <div class="admin-coupon-name">${c.emoji} ${c.title}</div>
+        <div class="admin-coupon-name">${esc(c.emoji)} ${esc(c.title)}${tierDot}</div>
         <div class="admin-coupon-cost">${c.kisses} 💋</div>
+        <button class="edit-btn" onclick="openCouponEditor('${c.id}')">Edit</button>
         ${count ? `<button class="reset-btn" onclick="adminReset('${c.id}')">Reset</button>` : ''}
       </div>
       <div class="admin-coupon-detail">
@@ -1091,11 +1270,12 @@ function renderAdmin() {
     </div>`;
   }).join('');
 
+  /* ── Activity log ── */
   const logRows = !log.length
     ? '<div class="log-empty">No activity yet.</div>'
     : log.slice(0, 40).map(e => {
         const isCredit = e.type === 'credit';
-        const coupon = e.couponId ? COUPONS.find(c => c.id === e.couponId) : null;
+        const coupon = e.couponId ? coupons.find(c => c.id === e.couponId) : null;
         const sign = isCredit
           ? `<span class="log-sign plus">+${e.amount}</span>`
           : `<span class="log-sign minus">−${e.amount}</span>`;
@@ -1110,6 +1290,8 @@ function renderAdmin() {
 
   document.getElementById('admin-scroll').innerHTML = `
     <button class="switch-view-btn" onclick="adminSwitchToHerView()">👁 View as Ainu</button>
+
+    ${suggestionsHtml}
 
     <div class="admin-section">
       <div class="admin-section-title">Kiss Balance</div>
@@ -1127,8 +1309,11 @@ function renderAdmin() {
     </div>
 
     <div class="admin-section">
-      <div class="admin-section-title">Coupons</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+        <div class="admin-section-title" style="margin-bottom:0;">Coupons</div>
+      </div>
       ${couponRows}
+      <button class="new-coupon-btn" onclick="openCouponEditor(null)">+ Add new coupon</button>
     </div>
 
     <div class="admin-section">
@@ -1151,7 +1336,7 @@ async function adminAddKisses() {
 }
 
 async function adminReset(couponId) {
-  const c = COUPONS.find(x => x.id === couponId);
+  const c = STATE.coupons.find(x => x.id === couponId);
   if (!confirm(`Reset all redemptions for "${c.title}"?\n\nThis cannot be undone.`)) return;
   await resetCouponHistory(couponId);
   renderAdmin();
@@ -1181,6 +1366,220 @@ async function adminUpdateRedeemedDate(couponId, inputId, value) {
   }
   renderAdmin();
 }
+
+/* ═══════════════════════════════════════════════════
+   COUPON EDITOR (admin)
+   ═══════════════════════════════════════════════════ */
+let _editorCoupon = null;
+let _editorInputs = [];
+
+function openCouponEditor(couponIdOrNull) {
+  const c = couponIdOrNull ? STATE.coupons.find(x => x.id === couponIdOrNull) : null;
+  _editorCoupon = c;
+  _editorInputs = c ? JSON.parse(JSON.stringify(c.inputs || [])) : [];
+
+  document.getElementById('editor-title').textContent = c ? 'Edit Coupon' : 'New Coupon';
+  document.getElementById('editor-emoji').value   = c?.emoji       || '💋';
+  document.getElementById('editor-name').value    = c?.title       || '';
+  document.getElementById('editor-kisses').value  = c?.kisses      || '';
+  document.getElementById('editor-teaser').value  = c?.teaser      || '';
+  document.getElementById('editor-desc').value    = c?.description || c?.desc || '';
+  document.getElementById('editor-note').value    = c?.note        || '';
+  document.getElementById('editor-delete-btn').style.display = c ? '' : 'none';
+  _renderEditorInputs();
+  document.getElementById('coupon-editor').classList.add('on');
+}
+
+function closeCouponEditor() {
+  document.getElementById('coupon-editor').classList.remove('on');
+  _editorCoupon = null;
+  _editorInputs = [];
+}
+
+function _renderEditorInputs() {
+  const container = document.getElementById('editor-inputs-list');
+  if (!_editorInputs.length) {
+    container.innerHTML = '<div style="font-size:13px;color:var(--text-muted);font-style:italic;padding:4px 0 10px;">No options — coupon will have no input fields.</div>';
+    return;
+  }
+  const TYPE_LABEL = { pills:'🔘 Pill choices', date:'📅 Date picker', toggle:'☑ Toggle', text:'✏ Text field' };
+  container.innerHTML = _editorInputs.map((inp, i) => {
+    let extra = '';
+    if (inp.type === 'pills') {
+      extra = `
+        <div style="margin-top:8px;">
+          <label style="font-size:11px;color:var(--text-muted);">Options (comma-separated)</label>
+          <input class="field-input" style="margin-top:4px;font-size:13px;"
+            value="${esc((inp.options||[]).join(', '))}"
+            oninput="_updateEditorInput(${i},'options',this.value.split(',').map(s=>s.trim()).filter(Boolean))"
+            placeholder="Option A, Option B, …">
+          <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
+            <label style="font-size:11px;color:var(--text-muted);white-space:nowrap;">Max picks</label>
+            <input type="number" class="num-input" style="width:70px;padding:7px;font-size:14px;"
+              value="${inp.max||1}" min="1"
+              oninput="_updateEditorInput(${i},'max',+this.value)">
+          </div>
+        </div>`;
+    } else if (inp.type === 'toggle') {
+      extra = `
+        <div style="margin-top:8px;">
+          <label style="font-size:11px;color:var(--text-muted);">Hint text</label>
+          <input class="field-input" style="margin-top:4px;font-size:13px;"
+            value="${esc(inp.hint||'')}"
+            oninput="_updateEditorInput(${i},'hint',this.value)"
+            placeholder="Hint shown below toggle…">
+        </div>`;
+    } else if (inp.type === 'date') {
+      extra = `
+        <div style="margin-top:8px;display:flex;align-items:center;gap:8px;">
+          <input type="checkbox" id="ced-cd-${i}" ${inp.countdown?'checked':''}
+            onchange="_updateEditorInput(${i},'countdown',this.checked)">
+          <label for="ced-cd-${i}" style="font-size:12px;color:var(--text-muted);">Show countdown badge</label>
+        </div>`;
+    } else if (inp.type === 'text') {
+      extra = `
+        <div style="margin-top:8px;">
+          <label style="font-size:11px;color:var(--text-muted);">Placeholder</label>
+          <input class="field-input" style="margin-top:4px;font-size:13px;"
+            value="${esc(inp.placeholder||'')}"
+            oninput="_updateEditorInput(${i},'placeholder',this.value)"
+            placeholder="Placeholder text…">
+        </div>`;
+    }
+    return `<div class="editor-input-row">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <span style="font-size:11px;font-weight:600;color:var(--primary);text-transform:uppercase;letter-spacing:.08em;">${TYPE_LABEL[inp.type]||inp.type}</span>
+        <button onclick="_removeEditorInput(${i})" style="font-size:11px;color:#b05050;background:#f5e8e8;border:none;border-radius:8px;padding:3px 9px;cursor:pointer;">Remove</button>
+      </div>
+      <label style="font-size:11px;color:var(--text-muted);">Label</label>
+      <input class="field-input" style="margin-top:4px;font-size:13px;"
+        value="${esc(inp.label||'')}"
+        oninput="_updateEditorInput(${i},'label',this.value)"
+        placeholder="Label for this input…">
+      ${extra}
+    </div>`;
+  }).join('');
+}
+
+function addEditorInput(type) {
+  const id = type + '_' + Date.now().toString(36);
+  const defaults = {
+    pills:  { type:'pills',  id, label:'', options:[], max:1 },
+    date:   { type:'date',   id, label:'Choose date', countdown:true },
+    toggle: { type:'toggle', id, label:'', hint:'' },
+    text:   { type:'text',   id, label:'', placeholder:'' }
+  };
+  _editorInputs.push(defaults[type]);
+  _renderEditorInputs();
+}
+
+function _removeEditorInput(i) {
+  _editorInputs.splice(i, 1);
+  _renderEditorInputs();
+}
+
+function _updateEditorInput(i, key, value) {
+  _editorInputs[i][key] = value;
+}
+
+async function saveCouponFromEditor() {
+  const emoji       = document.getElementById('editor-emoji').value.trim()  || '💋';
+  const title       = document.getElementById('editor-name').value.trim();
+  const kisses      = parseInt(document.getElementById('editor-kisses').value);
+  const teaser      = document.getElementById('editor-teaser').value.trim();
+  const description = document.getElementById('editor-desc').value.trim();
+  const note        = document.getElementById('editor-note').value.trim();
+
+  if (!title)          { alert('Title is required.'); return; }
+  if (!kisses || kisses < 1) { alert('Kisses cost is required.'); return; }
+
+  const payload = { emoji, title, kisses, teaser, description, note: note || null,
+                    inputs: _editorInputs, status: 'active', suggested_by: 'admin' };
+
+  if (_editorCoupon) {
+    await _supabase.from('coupons').update(payload).eq('id', _editorCoupon.id);
+    const idx = STATE.coupons.findIndex(c => c.id === _editorCoupon.id);
+    if (idx >= 0) STATE.coupons[idx] = _mapCoupon({ ..._editorCoupon, ...payload });
+  } else {
+    const id = title.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'')
+               + '_' + Date.now().toString(36);
+    const sort_order = STATE.coupons.length;
+    const { data: created, error } = await _supabase.from('coupons')
+      .insert({ id, ...payload, sort_order }).select().single();
+    if (error) { alert('Error saving coupon: ' + error.message); return; }
+    if (created) STATE.coupons.push(_mapCoupon(created));
+  }
+
+  closeCouponEditor();
+  renderAdmin();
+}
+
+async function deleteCouponFromEditor() {
+  if (!_editorCoupon) return;
+  if (!confirm(`Delete "${_editorCoupon.title}"?\n\nThis cannot be undone.`)) return;
+  await _supabase.from('coupons').delete().eq('id', _editorCoupon.id);
+  STATE.coupons = STATE.coupons.filter(c => c.id !== _editorCoupon.id);
+  closeCouponEditor();
+  renderAdmin();
+}
+
+/* ─── Suggestion approval / rejection ── */
+async function approveSuggestion(id) {
+  const sug = STATE.suggestions.find(s => s.id === id);
+  if (!sug) return;
+  const input = prompt(`Approve "${sug.title}" — how many kisses should it cost?`);
+  const kisses = parseInt(input);
+  if (!kisses || kisses < 1) return;
+  const sort_order = STATE.coupons.length;
+  await _supabase.from('coupons')
+    .update({ status: 'active', kisses, sort_order }).eq('id', id);
+  STATE.suggestions = STATE.suggestions.filter(s => s.id !== id);
+  const { data: fresh } = await _supabase.from('coupons')
+    .select('*').eq('status','active').order('sort_order');
+  STATE.coupons = (fresh || []).map(_mapCoupon);
+  renderAdmin();
+}
+
+async function rejectSuggestion(id) {
+  const sug = STATE.suggestions.find(s => s.id === id);
+  if (!sug) return;
+  if (!confirm(`Reject "${sug.title}"?`)) return;
+  await _supabase.from('coupons').update({ status: 'rejected' }).eq('id', id);
+  STATE.suggestions = STATE.suggestions.filter(s => s.id !== id);
+  renderAdmin();
+}
+
+/* ═══════════════════════════════════════════════════
+   USER SUGGEST FORM
+   ═══════════════════════════════════════════════════ */
+function openSuggestForm() {
+  document.getElementById('suggest-emoji').value = '💋';
+  document.getElementById('suggest-title').value = '';
+  document.getElementById('suggest-desc').value  = '';
+  document.getElementById('suggest-overlay').classList.add('on');
+  document.getElementById('suggest-modal').classList.add('on');
+}
+
+function closeSuggestForm() {
+  document.getElementById('suggest-overlay').classList.remove('on');
+  document.getElementById('suggest-modal').classList.remove('on');
+}
+
+async function submitSuggestion() {
+  const emoji = document.getElementById('suggest-emoji').value.trim() || '💋';
+  const title = document.getElementById('suggest-title').value.trim();
+  const desc  = document.getElementById('suggest-desc').value.trim();
+  if (!title) { alert('Please give your idea a title!'); return; }
+  const id = 'suggest_' + Date.now().toString(36);
+  const { error } = await _supabase.from('coupons').insert({
+    id, emoji, title, description: desc, teaser: desc.slice(0,80),
+    kisses: 0, inputs: [], status: 'pending', suggested_by: 'user', sort_order: 999
+  });
+  if (error) { alert('Could not send — try again!'); return; }
+  closeSuggestForm();
+  alert('Your idea has been sent to Andrew! 💌');
+}
+
 /* ═══════════════════════════════════════════════════
    MODAL SWIPE-DOWN
    ═══════════════════════════════════════════════════ */
