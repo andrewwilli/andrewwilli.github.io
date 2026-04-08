@@ -749,7 +749,12 @@ function openCoupon(id) {
         const today = new Date();
         today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
         const minDate = today.toISOString().split('T')[0];
-        inputsHtml += `<input type="date" class="field-input" value="${esc(val)}" min="${minDate}" oninput="${isRedeemed ? `updateRedeemedDate('${inp.id}',this.value)` : `saveFieldLive('${inp.id}',this.value)`}">`;
+        inputsHtml += `<input type="date" class="field-input${isRedeemed ? ' frozen' : ''}" value="${esc(val)}" 
+  min="${minDate}" 
+  ${isRedeemed 
+    ? 'disabled' 
+    : `oninput="saveFieldLive('${inp.id}',this.value)"`}
+>`;
       } else if (inp.type === 'text') {
         const val = displayInputs[inp.id] || '';
         inputsHtml += `<input type="text" class="field-input${isRedeemed ? ' frozen' : ''}" value="${esc(val)}" placeholder="${esc(inp.placeholder||'')}" ${isRedeemed ? 'disabled' : `oninput="saveFieldLive('${inp.id}',this.value)"`}>`;
@@ -983,6 +988,32 @@ function renderAdmin() {
     const count = redemptions.length;
     const lastDate = count ? redemptions[0].date : null;
     const lastDetail = count ? fmtInputSummary(c, redemptions[0].inputs) : null;
+
+    let adminDateEditor = '';
+    if (count > 0) {
+      const redeemedInputs = redemptions[0].inputs || {};
+      const dateInput = (c.inputs || []).find(inp => inp.type === 'date');
+
+      if (dateInput) {
+        const val = redeemedInputs[dateInput.id] || '';
+        const today = new Date();
+        today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+        const minDate = today.toISOString().split('T')[0];
+
+        adminDateEditor = `
+          <div style="margin-top:8px;">
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">Change redeemed date</div>
+            <input
+              type="date"
+              class="field-input"
+              value="${esc(val)}"
+              min="${minDate}"
+              oninput="adminUpdateRedeemedDate('${c.id}', '${dateInput.id}', this.value)">
+          </div>
+        `;
+      }
+    }
+
     return `<div class="admin-coupon">
       <div class="admin-coupon-head">
         <div class="admin-coupon-name">${c.emoji} ${c.title}</div>
@@ -992,6 +1023,7 @@ function renderAdmin() {
       <div class="admin-coupon-detail">
         ${count === 0 ? 'Never redeemed' : `${count}× — last: ${lastDate}${lastDetail ? ' · ' + esc(lastDetail) : ''}`}
       </div>
+      ${adminDateEditor}
     </div>`;
   }).join('');
 
@@ -1060,7 +1092,25 @@ function adminReset(couponId) {
   resetCouponHistory(couponId);
   renderAdmin();
 }
+function adminUpdateRedeemedDate(couponId, inputId, value) {
+  const today = new Date();
+  today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+  const minDate = today.toISOString().split('T')[0];
 
+  if (value < minDate) value = minDate;
+
+  const s = getStore();
+  if (!s.redemptions || !s.redemptions[couponId] || !s.redemptions[couponId].length) return;
+
+  if (!s.redemptions[couponId][0].inputs) {
+    s.redemptions[couponId][0].inputs = {};
+  }
+
+  s.redemptions[couponId][0].inputs[inputId] = value;
+  setStore(s);
+
+  renderAdmin();
+}
 /* ═══════════════════════════════════════════════════
    MODAL SWIPE-DOWN
    ═══════════════════════════════════════════════════ */
