@@ -749,7 +749,7 @@ function openCoupon(id) {
         const today = new Date();
         today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
         const minDate = today.toISOString().split('T')[0];
-        inputsHtml += `<input type="date" class="field-input${isRedeemed ? ' frozen' : ''}" value="${esc(val)}" min="${minDate}" ${isRedeemed ? 'disabled' : `oninput="saveFieldLive('${inp.id}',this.value)"`}>`;
+        inputsHtml += `<input type="date" class="field-input" value="${esc(val)}" min="${minDate}" oninput="${isRedeemed ? `updateRedeemedDate('${inp.id}',this.value)` : `saveFieldLive('${inp.id}',this.value)`}">`;
       } else if (inp.type === 'text') {
         const val = displayInputs[inp.id] || '';
         inputsHtml += `<input type="text" class="field-input${isRedeemed ? ' frozen' : ''}" value="${esc(val)}" placeholder="${esc(inp.placeholder||'')}" ${isRedeemed ? 'disabled' : `oninput="saveFieldLive('${inp.id}',this.value)"`}>`;
@@ -841,7 +841,23 @@ function saveFieldLive(inputId, value) {
   saveCouponInput(activeCouponId, inputId, value);
   renderList();
 }
+  
+function updateRedeemedDate(inputId, value) {
+  if (!activeCouponId) return;
 
+  const s = getStore();
+  if (!s.redemptions || !s.redemptions[activeCouponId] || !s.redemptions[activeCouponId].length) return;
+
+  if (!s.redemptions[activeCouponId][0].inputs) {
+    s.redemptions[activeCouponId][0].inputs = {};
+  }
+
+  s.redemptions[activeCouponId][0].inputs[inputId] = value;
+  setStore(s);
+
+  renderList();
+  openCoupon(activeCouponId);
+}
 /* ═══════════════════════════════════════════════════
    REDEEM FLOW
    ═══════════════════════════════════════════════════ */
