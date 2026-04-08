@@ -10,6 +10,7 @@
   <title>Love Coupons for Ainu</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="apple-touch-icon" href="icon-180.png">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -32,6 +33,56 @@
       height: 100%; font-family: 'Inter', -apple-system, sans-serif;
       background: var(--bg); color: var(--text);
       -webkit-font-smoothing: antialiased; overflow: hidden;
+    }
+
+    /* ─── QUICK-OPEN SCREEN ──────────────────────────────────── */
+    #quick-open-screen {
+      position: fixed; inset: 0; z-index: 1000;
+      background: var(--primary);
+      display: none; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 40px;
+    }
+    .quick-logo {
+      width: 90px; height: 90px; border-radius: 22px;
+      object-fit: cover; margin-bottom: 22px;
+      animation: float 3s ease-in-out infinite;
+      -webkit-user-select: none; user-select: none;
+      -webkit-touch-callout: none;
+      cursor: pointer;
+    }
+    .quick-open-btn {
+      margin-top: 44px; padding: 16px 40px;
+      background: white; color: var(--primary);
+      border: none; border-radius: 40px; font-size: 16px;
+      font-family: 'Inter', sans-serif; font-weight: 500;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation; transition: transform 0.1s ease;
+    }
+    .quick-open-btn:active { transform: scale(0.96); }
+
+    /* ─── ADMIN PIN OVERLAY ───────────────────────────────────
+       Shown on long-press when device is already remembered.    */
+    #admin-pin-overlay {
+      position: fixed; inset: 0; z-index: 1100;
+      background: rgba(0,0,0,0.65);
+      display: none; align-items: center; justify-content: center;
+      padding: 24px;
+    }
+    #admin-pin-overlay.on { display: flex; }
+    .admin-pin-box {
+      background: var(--primary-dark); border-radius: 24px;
+      padding: 32px 24px 26px; width: 100%; max-width: 300px;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .admin-pin-label {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.12em; color: rgba(255,255,255,0.5);
+      margin-bottom: 20px;
+    }
+    .admin-pin-cancel {
+      margin-top: 20px; font-size: 13px; color: rgba(255,255,255,0.45);
+      cursor: pointer; padding: 8px; -webkit-tap-highlight-color: transparent;
     }
 
     /* ─── PIN SCREEN ─────────────────────────────────────────── */
@@ -405,6 +456,47 @@
 <div id="loading">
   <div class="loading-heart">💌</div>
   <div class="loading-text">Loading…</div>
+</div>
+
+<!-- QUICK-OPEN SCREEN (shown when device is already remembered) -->
+<div id="quick-open-screen">
+  <img class="quick-logo" src="icon-180.png" alt="Love Coupons"
+    onmousedown="startAdminLongPress()" onmouseup="cancelAdminLongPress()" onmouseleave="cancelAdminLongPress()"
+    ontouchstart="startAdminLongPress(event)" ontouchend="cancelAdminLongPress()" ontouchmove="cancelAdminLongPress()"
+    oncontextmenu="return false">
+  <div class="pin-title">Love Coupons</div>
+  <div class="pin-sub">for Ainu, with love ♡</div>
+  <button class="quick-open-btn" onclick="enterUserModeQuick()">Open my coupons ♡</button>
+</div>
+
+<!-- ADMIN PIN OVERLAY (long-press triggered from quick-open screen) -->
+<div id="admin-pin-overlay">
+  <div class="admin-pin-box">
+    <div class="admin-pin-label">Admin access</div>
+    <div class="pin-dots" id="admin-pin-dots">
+      <div class="pin-dot"></div><div class="pin-dot"></div>
+      <div class="pin-dot"></div><div class="pin-dot"></div>
+      <div class="pin-dot"></div><div class="pin-dot"></div>
+    </div>
+    <div style="margin-top:28px;">
+      <div class="pin-pad">
+        <button class="pin-btn" onclick="adminPinKey('1')">1</button>
+        <button class="pin-btn" onclick="adminPinKey('2')">2</button>
+        <button class="pin-btn" onclick="adminPinKey('3')">3</button>
+        <button class="pin-btn" onclick="adminPinKey('4')">4</button>
+        <button class="pin-btn" onclick="adminPinKey('5')">5</button>
+        <button class="pin-btn" onclick="adminPinKey('6')">6</button>
+        <button class="pin-btn" onclick="adminPinKey('7')">7</button>
+        <button class="pin-btn" onclick="adminPinKey('8')">8</button>
+        <button class="pin-btn" onclick="adminPinKey('9')">9</button>
+        <button class="pin-btn ghost"></button>
+        <button class="pin-btn" onclick="adminPinKey('0')">0</button>
+        <button class="pin-btn" onclick="adminPinDel()">⌫</button>
+      </div>
+    </div>
+    <div class="pin-error" id="admin-pin-error"></div>
+    <div class="admin-pin-cancel" onclick="hideAdminPinOverlay()">Cancel</div>
+  </div>
 </div>
 
 <!-- PIN SCREEN -->
@@ -793,8 +885,10 @@ function renderDots() {
   document.querySelectorAll('.pin-dot').forEach((el,i) => el.classList.toggle('on', i < pinVal.length));
 }
 function checkPin() {
-  if (pinVal === USER_PIN) { hidePinScreen(); enterUserMode(); }
-  else if (pinVal === ADMIN_PIN) { hidePinScreen(); enterAdminMode(); }
+  if (pinVal === USER_PIN) {
+    localStorage.setItem('lc_unlocked', '1'); // remember this device
+    hidePinScreen(); enterUserMode();
+  } else if (pinVal === ADMIN_PIN) { hidePinScreen(); enterAdminMode(); }
   else {
     pinVal = ''; renderDots();
     document.getElementById('pin-error').textContent = 'Wrong code — try again';
@@ -807,6 +901,79 @@ function hidePinScreen() {
   const ps = document.getElementById('pin-screen');
   ps.classList.add('out');
   setTimeout(() => { ps.style.display = 'none'; }, 400);
+}
+
+/* ═══════════════════════════════════════════════════
+   QUICK-OPEN (remembered device)
+   ═══════════════════════════════════════════════════ */
+function enterUserModeQuick() {
+  document.getElementById('quick-open-screen').style.display = 'none';
+  // Welcome screen only once; after that go straight to app
+  if (!localStorage.getItem('lc_seen')) {
+    localStorage.setItem('lc_seen', '1');
+    document.getElementById('welcome-screen').classList.add('on');
+  } else {
+    showApp();
+  }
+}
+
+/* ─── Admin long-press (from quick-open screen) ─── */
+let _lpTimer = null;
+
+function startAdminLongPress(e) {
+  if (e) e.preventDefault(); // prevent iOS context menu / text select
+  _lpTimer = setTimeout(() => {
+    _lpTimer = null;
+    showAdminPinOverlay();
+  }, 600);
+}
+
+function cancelAdminLongPress() {
+  if (_lpTimer) { clearTimeout(_lpTimer); _lpTimer = null; }
+}
+
+function showAdminPinOverlay() {
+  _adminPinVal = '';
+  _renderAdminPinDots();
+  document.getElementById('admin-pin-error').textContent = '';
+  document.getElementById('admin-pin-overlay').classList.add('on');
+}
+
+function hideAdminPinOverlay() {
+  document.getElementById('admin-pin-overlay').classList.remove('on');
+  _adminPinVal = '';
+}
+
+/* ─── Admin overlay PIN logic ─── */
+let _adminPinVal = '';
+
+function adminPinKey(d) {
+  if (_adminPinVal.length >= 6) return;
+  _adminPinVal += d;
+  _renderAdminPinDots();
+  if (_adminPinVal.length === 6) setTimeout(_checkAdminPinOverlay, 120);
+}
+
+function adminPinDel() { _adminPinVal = _adminPinVal.slice(0, -1); _renderAdminPinDots(); }
+
+function _renderAdminPinDots() {
+  document.querySelectorAll('#admin-pin-dots .pin-dot')
+    .forEach((el, i) => el.classList.toggle('on', i < _adminPinVal.length));
+}
+
+function _checkAdminPinOverlay() {
+  if (_adminPinVal === ADMIN_PIN) {
+    hideAdminPinOverlay();
+    document.getElementById('quick-open-screen').style.display = 'none';
+    enterAdminMode();
+  } else {
+    _adminPinVal = '';
+    _renderAdminPinDots();
+    document.getElementById('admin-pin-error').textContent = 'Wrong code — try again';
+    const d = document.getElementById('admin-pin-dots');
+    d.classList.add('shake');
+    setTimeout(() => { d.classList.remove('shake'); document.getElementById('admin-pin-error').textContent = ''; }, 400);
+  }
 }
 
 /* ═══════════════════════════════════════════════════
@@ -838,11 +1005,16 @@ async function enterAdminMode() {
 }
 function exitAdmin() {
   document.getElementById('admin-panel').classList.remove('on');
-  // return to PIN screen
-  pinVal = ''; renderDots();
-  document.getElementById('pin-error').textContent = '';
-  document.getElementById('pin-screen').style.display = '';
-  document.getElementById('pin-screen').classList.remove('out');
+  if (localStorage.getItem('lc_unlocked')) {
+    // Device is remembered — return to quick-open screen
+    document.getElementById('quick-open-screen').style.display = 'flex';
+  } else {
+    // Return to PIN screen
+    pinVal = ''; renderDots();
+    document.getElementById('pin-error').textContent = '';
+    document.getElementById('pin-screen').style.display = '';
+    document.getElementById('pin-screen').classList.remove('out');
+  }
 }
 function adminSwitchToHerView() {
   document.getElementById('admin-panel').classList.remove('on');
@@ -1609,7 +1781,7 @@ function dismissHint() {
 }
 
 /* ═══════════════════════════════════════════════════
-   PWA + ICON
+   PWA MANIFEST
    ═══════════════════════════════════════════════════ */
 (function () {
   try {
@@ -1617,26 +1789,16 @@ function dismissHint() {
     l.href = URL.createObjectURL(new Blob([JSON.stringify({
       name: 'Love Coupons for Ainu', short_name: 'Love Coupons',
       start_url: './', display: 'standalone',
-      background_color: '#f7f4ef', theme_color: '#2a5955', orientation: 'portrait'
+      background_color: '#2a5955', theme_color: '#2a5955', orientation: 'portrait',
+      icons: [{ src: 'icon-180.png', sizes: '180x180', type: 'image/png' },
+              { src: 'icon.png',     sizes: '1024x1024', type: 'image/png' }]
     })], { type: 'application/json' }));
     document.head.appendChild(l);
-  } catch(e) {}
-  try {
-    const sz = 180, cv = document.createElement('canvas');
-    cv.width = cv.height = sz;
-    const ctx = cv.getContext('2d');
-    ctx.fillStyle = '#2a5955'; ctx.fillRect(0,0,sz,sz);
-    ctx.fillStyle = 'white'; ctx.font = `${sz*.52}px serif`;
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText('♡', sz/2, sz/2+2);
-    const l2 = document.createElement('link');
-    l2.rel = 'apple-touch-icon'; l2.href = cv.toDataURL();
-    document.head.appendChild(l2);
   } catch(e) {}
 })();
 
 /* ═══════════════════════════════════════════════════
-   INIT — load from Supabase, then render
+   INIT — load from Supabase, then show right screen
    ═══════════════════════════════════════════════════ */
 (async () => {
   const loading = document.getElementById('loading');
@@ -1648,6 +1810,13 @@ function dismissHint() {
   }
   loading.style.display = 'none';
   renderList();
+
+  if (localStorage.getItem('lc_unlocked')) {
+    // Device already trusted — skip PIN, show quick-open
+    document.getElementById('pin-screen').style.display = 'none';
+    document.getElementById('quick-open-screen').style.display = 'flex';
+  }
+  // else: pin-screen is visible by default (no change needed)
 })();
 </script>
 </body>
