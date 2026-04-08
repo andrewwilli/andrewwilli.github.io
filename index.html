@@ -289,9 +289,25 @@
     .hint-text { font-size: 13px; font-weight: 300; line-height: 1.45; flex: 1; }
     .hint-text strong { font-weight: 500; }
     .hint-close { font-size: 20px; cursor: pointer; opacity: 0.6; padding: 4px; -webkit-tap-highlight-color: transparent; }
+
+    /* ─── LOADING OVERLAY ───────────────────────────────────────── */
+    #loading {
+      display: none; position: fixed; inset: 0; z-index: 2000;
+      background: var(--primary); flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .loading-heart { font-size: 40px; animation: float 1.5s ease-in-out infinite; }
+    .loading-text  { font-size: 13px; color: rgba(255,255,255,0.55); margin-top: 12px; font-weight: 300; }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
+
+<!-- LOADING OVERLAY -->
+<div id="loading">
+  <div class="loading-heart">💌</div>
+  <div class="loading-text">Loading…</div>
+</div>
 
 <!-- PIN SCREEN -->
 <div id="pin-screen">
@@ -499,49 +515,97 @@ const TC_ITEMS = [
 ];
 
 /* ═══════════════════════════════════════════════════
-   STORAGE
-   Shape: {
-     kisses: 42,
-     inputs:      { couponId: { inputId: value } },
-     redemptions: { couponId: [ {date, ts, inputs} ] },
-     log:         [ {type, amount, note?, couponId?, ts} ]
-   }
+   SUPABASE CONFIGURATION
+   Replace the two placeholder strings below with your
+   project URL and anon key from:
+   Supabase Dashboard → Project Settings → API
    ═══════════════════════════════════════════════════ */
-const SK = 'lc5';
-function getStore() { try { return JSON.parse(localStorage.getItem(SK) || '{}'); } catch { return {}; } }
-function setStore(s) { localStorage.setItem(SK, JSON.stringify(s)); }
-function getKisses() { return getStore().kisses || 0; }
-function getCouponRedemptions(id) { return (getStore().redemptions || {})[id] || []; }
-function getSavedInputs(id) { return (getStore().inputs || {})[id] || {}; }
+const SUPABASE_URL      = 'ttps://bjyrmrhboggzqcvzzwbj.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqeXJtcmhib2dnenFjdnp6d2JqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2MzMwNzAsImV4cCI6MjA5MTIwOTA3MH0.eBCj6zlWoR2bmmeXPTRtP1uGg0E9xzLGGktX3Q9ot00';
 
+const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* ═══════════════════════════════════════════════════
+   STORAGE
+   In-memory STATE is loaded from Supabase at startup
+   and kept in sync on every write. Getters are sync
+   (reads from STATE); setters are async (write to
+   both STATE and Supabase).
+   ═══════════════════════════════════════════════════ */
+let STATE = { kisses: 0, inputs: {}, redemptions: {}, log: [] };
+
+async function loadFromSupabase() {
+  // Kiss balance
+  const { data: st } = await _supabase.from('app_state').select('kisses').eq('id', 1).single();
+  if (st) STATE.kisses = st.kisses;
+
+  // Saved coupon inputs (draft selections before redemption)
+  const { data: inputs } = await _supabase.from('coupon_inputs').select('coupon_id, inputs');
+  STATE.inputs = {};
+  (inputs || []).forEach(r => { STATE.inputs[r.coupon_id] = r.inputs; });
+
+  // Redemptions
+  const { data: reds } = await _supabase.from('redemptions').select('*').order('ts', { ascending: false });
+  STATE.redemptions = {};
+  (reds || []).forEach(r => {
+    if (!STATE.redemptions[r.coupon_id]) STATE.redemptions[r.coupon_id] = [];
+    STATE.redemptions[r.coupon_id].push({ date: r.redeemed_date, ts: r.ts, inputs: r.inputs });
+  });
+
+  // Activity log
+  const { data: log } = await _supabase.from('activity_log').select('*').order('ts', { ascending: false }).limit(40);
+  STATE.log = (log || []).map(r => ({ type: r.type, amount: r.amount, note: r.note, couponId: r.coupon_id, ts: r.ts }));
+
+  // Realtime: refresh balance the moment Andrew approves kisses remotely
+  _supabase.channel('balance')
+    .on('postgres_changes',
+      { event: 'UPDATE', schema: 'public', table: 'app_state', filter: 'id=eq.1' },
+      payload => {
+        STATE.kisses = payload.new.kisses;
+        updateBalanceDisplay();
+        renderList();
+      })
+    .subscribe();
+}
+
+// ── Sync getters (read from in-memory STATE) ────────────────────
+function getKisses()              { return STATE.kisses; }
+function getCouponRedemptions(id) { return STATE.redemptions[id] || []; }
+function getSavedInputs(id)       { return STATE.inputs[id] || {}; }
+
+// ── Setters (update STATE immediately, persist to Supabase) ─────
+
+// saveCouponInput is fire-and-forget — UI stays instant
 function saveCouponInput(couponId, inputId, value) {
-  const s = getStore();
-  if (!s.inputs) s.inputs = {};
-  if (!s.inputs[couponId]) s.inputs[couponId] = {};
-  s.inputs[couponId][inputId] = value;
-  setStore(s);
+  if (!STATE.inputs[couponId]) STATE.inputs[couponId] = {};
+  STATE.inputs[couponId][inputId] = value;
+  _supabase.from('coupon_inputs')
+    .upsert({ coupon_id: couponId, inputs: STATE.inputs[couponId] }, { onConflict: 'coupon_id' });
 }
-function creditKisses(amount, note) {
-  const s = getStore();
-  s.kisses = (s.kisses || 0) + amount;
-  if (!s.log) s.log = [];
-  s.log.unshift({ type: 'credit', amount, note: note || '', ts: Date.now() });
-  setStore(s);
+
+async function creditKisses(amount, note) {
+  STATE.kisses = (STATE.kisses || 0) + amount;
+  const ts = Date.now();
+  STATE.log.unshift({ type: 'credit', amount, note: note || '', ts });
+  await _supabase.from('app_state').update({ kisses: STATE.kisses }).eq('id', 1);
+  await _supabase.from('activity_log').insert({ type: 'credit', amount, note: note || '', ts });
 }
-function spendKisses(couponId, kissCost, inputSnapshot) {
-  const s = getStore();
-  s.kisses = Math.max(0, (s.kisses || 0) - kissCost);
-  if (!s.redemptions) s.redemptions = {};
-  if (!s.redemptions[couponId]) s.redemptions[couponId] = [];
-  s.redemptions[couponId].unshift({ date: fmtDate(new Date()), ts: Date.now(), inputs: inputSnapshot });
-  if (!s.log) s.log = [];
-  s.log.unshift({ type: 'redeem', amount: kissCost, couponId, ts: Date.now() });
-  setStore(s);
+
+async function spendKisses(couponId, kissCost, inputSnapshot) {
+  STATE.kisses = Math.max(0, (STATE.kisses || 0) - kissCost);
+  const ts = Date.now();
+  const date = fmtDate(new Date());
+  if (!STATE.redemptions[couponId]) STATE.redemptions[couponId] = [];
+  STATE.redemptions[couponId].unshift({ date, ts, inputs: inputSnapshot });
+  STATE.log.unshift({ type: 'redeem', amount: kissCost, couponId, ts });
+  await _supabase.from('app_state').update({ kisses: STATE.kisses }).eq('id', 1);
+  await _supabase.from('redemptions').insert({ coupon_id: couponId, redeemed_date: date, ts, inputs: inputSnapshot });
+  await _supabase.from('activity_log').insert({ type: 'redeem', amount: kissCost, coupon_id: couponId, ts });
 }
-function resetCouponHistory(couponId) {
-  const s = getStore();
-  if (s.redemptions) delete s.redemptions[couponId];
-  setStore(s);
+
+async function resetCouponHistory(couponId) {
+  delete STATE.redemptions[couponId];
+  await _supabase.from('redemptions').delete().eq('coupon_id', couponId);
 }
 
 /* ═══════════════════════════════════════════════════
@@ -749,10 +813,10 @@ function openCoupon(id) {
         const today = new Date();
         today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
         const minDate = today.toISOString().split('T')[0];
-        inputsHtml += `<input type="date" class="field-input${isRedeemed ? ' frozen' : ''}" value="${esc(val)}" 
-  min="${minDate}" 
-  ${isRedeemed 
-    ? 'disabled' 
+        inputsHtml += `<input type="date" class="field-input${isRedeemed ? ' frozen' : ''}" value="${esc(val)}"
+  min="${minDate}"
+  ${isRedeemed
+    ? 'disabled'
     : `oninput="saveFieldLive('${inp.id}',this.value)"`}
 >`;
       } else if (inp.type === 'text') {
@@ -780,8 +844,8 @@ function openCoupon(id) {
   } else {
     const need = c.kisses - kisses;
     redeemHtml = `
-      <button class="redeem-btn cant-afford" onclick="showNeedMore(${need})">Need ${need} more kiss${need!==1?'es':''} 💋</button>
-      <div class="cant-afford-note">Balance: ${kisses} kiss${kisses!==1?'es':''} — give Andrew ${need} more!</div>`;
+      <button class="redeem-btn cant-afford" onclick="askForKissies(${need})">Ask Andrew for kisses 💌</button>
+      <div class="cant-afford-note">Balance: ${kisses} 💋 — need ${need} more to redeem</div>`;
   }
 
   // history (kept empty — single-use shows info inline above)
@@ -811,14 +875,31 @@ function closeModal() {
   activeCouponId = null;
 }
 
-function showNeedMore(need) {
-  alert(`You need ${need} more kiss${need!==1?'es':''} from Andrew!\nGo give him some love 💋`);
+async function askForKissies(amount) {
+  if (!confirm(`Ask Andrew for ${amount} kiss${amount !== 1 ? 'es' : ''}?\nHe'll get a Telegram message! 💌`)) return;
+  try {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/kiss-notify`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+      },
+      body: JSON.stringify({ type: 'kiss_request', amount })
+    });
+    if (res.ok) {
+      closeModal();
+      alert('Sent! Andrew will see your request 💋');
+    } else {
+      alert('Could not send right now — go give Andrew a real kiss instead!');
+    }
+  } catch {
+    alert('Could not send right now — go give Andrew a real kiss instead!');
+  }
 }
 
-function resetThisCoupon() {
-  // Hidden reset — for Andrew to use on her phone
+async function resetThisCoupon() {
   if (!activeCouponId) return;
-  resetCouponHistory(activeCouponId);
+  await resetCouponHistory(activeCouponId);
   closeModal();
   renderList();
 }
@@ -860,9 +941,9 @@ function startRedeem() {
 }
 function closeConfirm() { document.getElementById('confirm').classList.remove('on'); }
 
-function doRedeem() {
+async function doRedeem() {
   const c = COUPONS.find(x => x.id === activeCouponId);
-  spendKisses(activeCouponId, c.kisses, getSavedInputs(activeCouponId));
+  await spendKisses(activeCouponId, c.kisses, getSavedInputs(activeCouponId));
   closeConfirm();
   closeModal();
   renderList();
@@ -963,12 +1044,11 @@ function hideTC() { document.getElementById('tc-screen').classList.remove('on');
    ADMIN PANEL
    ═══════════════════════════════════════════════════ */
 function renderAdmin() {
-  const store = getStore();
-  const kisses = store.kisses || 0;
-  const log = store.log || [];
+  const kisses = STATE.kisses || 0;
+  const log = STATE.log || [];
 
   const couponRows = COUPONS.map(c => {
-    const redemptions = (store.redemptions || {})[c.id] || [];
+    const redemptions = (STATE.redemptions || {})[c.id] || [];
     const count = redemptions.length;
     const lastDate = count ? redemptions[0].date : null;
     const lastDetail = count ? fmtInputSummary(c, redemptions[0].inputs) : null;
@@ -1062,37 +1142,43 @@ function renderAdmin() {
   `;
 }
 
-function adminAddKisses() {
+async function adminAddKisses() {
   const amount = parseInt(document.getElementById('admin-amount').value);
   const note = document.getElementById('admin-note').value.trim();
   if (!amount || amount < 1) { alert('Enter a number of kisses to add.'); return; }
-  creditKisses(amount, note);
+  await creditKisses(amount, note);
   renderAdmin();
 }
 
-function adminReset(couponId) {
+async function adminReset(couponId) {
   const c = COUPONS.find(x => x.id === couponId);
   if (!confirm(`Reset all redemptions for "${c.title}"?\n\nThis cannot be undone.`)) return;
-  resetCouponHistory(couponId);
+  await resetCouponHistory(couponId);
   renderAdmin();
 }
-function adminUpdateRedeemedDate(couponId, inputId, value) {
+async function adminUpdateRedeemedDate(couponId, inputId, value) {
   const today = new Date();
   today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
   const minDate = today.toISOString().split('T')[0];
-
   if (value < minDate) value = minDate;
 
-  const s = getStore();
-  if (!s.redemptions || !s.redemptions[couponId] || !s.redemptions[couponId].length) return;
+  if (!STATE.redemptions[couponId]?.length) return;
+  if (!STATE.redemptions[couponId][0].inputs) STATE.redemptions[couponId][0].inputs = {};
+  STATE.redemptions[couponId][0].inputs[inputId] = value;
 
-  if (!s.redemptions[couponId][0].inputs) {
-    s.redemptions[couponId][0].inputs = {};
+  // Find the most recent DB row for this coupon and patch its inputs JSONB
+  const { data: latest } = await _supabase
+    .from('redemptions')
+    .select('id, inputs')
+    .eq('coupon_id', couponId)
+    .order('ts', { ascending: false })
+    .limit(1)
+    .single();
+  if (latest) {
+    await _supabase.from('redemptions')
+      .update({ inputs: { ...latest.inputs, [inputId]: value } })
+      .eq('id', latest.id);
   }
-
-  s.redemptions[couponId][0].inputs[inputId] = value;
-  setStore(s);
-
   renderAdmin();
 }
 /* ═══════════════════════════════════════════════════
@@ -1151,9 +1237,19 @@ function dismissHint() {
 })();
 
 /* ═══════════════════════════════════════════════════
-   INIT
+   INIT — load from Supabase, then render
    ═══════════════════════════════════════════════════ */
-renderList();
+(async () => {
+  const loading = document.getElementById('loading');
+  loading.style.display = 'flex';
+  try {
+    await loadFromSupabase();
+  } catch (e) {
+    console.error('Supabase load failed:', e);
+  }
+  loading.style.display = 'none';
+  renderList();
+})();
 </script>
 </body>
 </html>
