@@ -882,7 +882,7 @@ function pinKey(d) {
 }
 function pinDel() { pinVal = pinVal.slice(0,-1); renderDots(); }
 function renderDots() {
-  document.querySelectorAll('.pin-dot').forEach((el,i) => el.classList.toggle('on', i < pinVal.length));
+  document.querySelectorAll('#pin-dots .pin-dot').forEach((el,i) => el.classList.toggle('on', i < pinVal.length));
 }
 function checkPin() {
   if (pinVal === USER_PIN) {
