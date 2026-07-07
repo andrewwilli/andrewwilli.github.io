@@ -33,6 +33,12 @@
       height: 100%; font-family: 'Inter', -apple-system, sans-serif;
       background: var(--bg); color: var(--text);
       -webkit-font-smoothing: antialiased; overflow: hidden;
+      -webkit-user-select: none; user-select: none;
+      -webkit-touch-callout: none;
+    }
+    
+    input, textarea {
+      -webkit-user-select: auto; user-select: auto;
     }
 
     /* ─── QUICK-OPEN SCREEN ──────────────────────────────────── */
@@ -158,6 +164,10 @@
       padding: 14px 20px 18px;
       padding-top: max(14px, env(safe-area-inset-top));
       flex-shrink: 0;
+      position: relative;
+      z-index: 10;
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
     }
     .app-header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3px; }
     .app-title { font-family: 'Playfair Display', serif; font-size: 21px; font-weight: 600; color: white; }
